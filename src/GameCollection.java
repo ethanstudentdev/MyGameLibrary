@@ -60,10 +60,18 @@ public class GameCollection {
      */
     public String getTitle() {return title;}
 
-    public void printAllNames(){
+    public void printAllGames()
+    {
+        int i = 0;
         for(BoardGame game : games)
         {
+            i++;
+            System.out.println("Game # : " + i);
+            System.out.println("Title");
             System.out.println(game.getTitle());
+            System.out.println("Description");
+            System.out.println(game.getDescription());
+            System.out.println();
         }
     }
 

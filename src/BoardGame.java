@@ -43,6 +43,7 @@ public class BoardGame {
 
     //Methods
 
+    //Getters//
     /**
      * Gets the description of a BoardGame object
      *
@@ -58,12 +59,26 @@ public class BoardGame {
     public String getGenre(){return genre;}
 
     /**
+     * Gets the title for a BoardGame object
+     *
+     * @return String representing title of a Board Game
+     */
+    public String getTitle(){return title;}
+
+    //Setters//
+    /**
      * Sets the title for a BoardGame object
      *
      * @param title The title of the Board Game
      */
     public void setTitle(String title){this.title = title;}
 
-    public String getTitle(){return title;}
+    /**
+     * Sets the description for a BoardGame object
+     *
+     * @param description The description of the Board Game
+     */
+    public void setDescription(String description){this.description = description;}
+
 
 }

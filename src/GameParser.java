@@ -7,7 +7,6 @@ import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class GameParser {
     public static void main(){
@@ -35,42 +34,54 @@ public class GameParser {
             NodeList list = document.getElementsByTagName("item");
             for(int i = 0 ; i < list.getLength() ; i++)
             {
-                //Board Game for current item
+                //Board Game for current item node (Represents a board game in XML doc)
                 BoardGame game = new BoardGame();
 
-                //Logic for name node
-                NodeList nameList = document.getElementsByTagName("name");
-                Node nameNode = nameList.item(i);
-                if (nameNode.getNodeType() == Node.ELEMENT_NODE)
-                {
-                    Element items = (Element) nameNode;
-                    NamedNodeMap attributes = items.getAttributes();
-                    System.out.println("Current Node: " + (i + 1));
-                    for (int k = 0; k < attributes.getLength(); k++)
-                    {
-                        Node attr = attributes.item(k);
+                //Represents item node
+                Node node = list.item(i);
 
-                        System.out.println("Attribute name: " + attr.getNodeName());
-                        System.out.println("Attribute value: " + attr.getNodeValue());
-                        System.out.println();
-                    }
-                    //Only assigns BoardGame name if it is the primary name for the game
-                    if(items.getAttribute("type").equals("primary"))
+                //Represents a generic element of node item
+                Element itemElement = (Element) node;
+
+                //Logic for children name nodes//
+                NodeList nameList = itemElement.getElementsByTagName("name");
+
+                for(int j = 0 ; j < nameList.getLength() ; j++)
+                {
+                    Node nameNode = nameList.item(j);
+                    if(nameNode.getNodeType() == Node.ELEMENT_NODE)
                     {
-                        System.out.println("This was a primary!");
-                        game.setTitle(items.getAttribute("value"));
+                        Element nameElement = (Element) nameNode;
+                        if ("primary".equals(nameElement.getAttribute("type")))
+                        {
+                            game.setTitle(nameElement.getAttribute("value"));
+                        }
                     }
                 }
-                //End name node logic
+                //End children name nodes logic//
 
+                //Logic for children description nodes//
+                NodeList descriptionList = itemElement.getElementsByTagName("description");
+                Node descriptionNode = descriptionList.item(0);
+                if(descriptionNode.getNodeType() == Node.ELEMENT_NODE)
+                {
+                    Element descriptionElement = (Element) descriptionNode;
+                    //Sets a description if there is one
+                    if(!(descriptionElement.getTextContent()).isBlank())
+                    {
+                        game.setDescription(descriptionElement.getTextContent());
+                    }
+                }
+                //End name children description nodes logic//
+
+                //Adds BoardGame to master collection
                 master.addGame(game);
-                System.out.println("---Next Node---");
             }
 
         } catch (ParserConfigurationException | IOException | SAXException e) {
             throw new RuntimeException(e);
         }
         //Debug method call
-        master.printAllNames();
+        master.printAllGames();
     }
 }

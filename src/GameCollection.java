@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 /**
  * A class that represents a single collection of BoardGame objects
+ *
+ * @author Ethan Johnson
  */
 public class GameCollection {
     //Fields

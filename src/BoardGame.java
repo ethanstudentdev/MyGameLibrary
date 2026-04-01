@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 /**
  * A class that represents a single BoardGame object
+ *
+ * @author Ethan Johnson
  */
 public class BoardGame {
     //Fields

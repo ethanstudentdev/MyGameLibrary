@@ -27,6 +27,16 @@ public class User {
     //Methods
 
     /**
+     * Checks if a username already exists in the AccountDatabase
+     *
+     * @param username The username to check
+     * @return true if the username exists, false otherwise
+     */
+    public boolean userExists(String username) {
+        return accountDatabase.userExists(username);
+    }
+
+    /**
      * Creates a new account for the User with the provided credentials
      * and registers it in the AccountDatabase
      *
@@ -36,7 +46,7 @@ public class User {
     public void createAccount(String username, String password) {
         this.username = username;
         this.password = password;
-        accountDatabase.setAccountInfo(username, password);
+        accountDatabase.setAccountInfo(username, password, false);
     }
 
     /**

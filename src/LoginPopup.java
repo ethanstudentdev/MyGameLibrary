@@ -1,8 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * LoginPopup class for login UI, authentication logic, and event handling.
@@ -11,9 +9,6 @@ import java.util.Map;
  * - User interface for login and account creation
  * - Authentication logic and validation
  * - Event callbacks for login/logout
- *
- * TODO: AccountDatabase stuff
- * Currently, user data is stored in-memory only.
  *
  * @author Nathaniel Chan
  */
@@ -29,8 +24,8 @@ public class LoginPopup extends JFrame {
     // Authentication listener callback
     private LoginListener listener;
 
-    // In-memory user storage (TODO: Replace with AccountDatabase)
-    private Map<String, String> userDatabase;
+    // User for login and account creation
+    private User user;
 
     /**
      * Interface for login event callbacks.
@@ -58,10 +53,7 @@ public class LoginPopup extends JFrame {
      */
     public LoginPopup(LoginListener listener) {
         this.listener = listener;
-        this.userDatabase = new HashMap<>();
-
-        // Initialize with demo users
-        userDatabase.put("user1", "password1");
+        this.user = new User();
 
         setTitle("My Game Library - Login");
         initializeUI();
@@ -187,8 +179,6 @@ public class LoginPopup extends JFrame {
     /**
      * Handles the login button action.
      * Validates input and attempts to authenticate the user.
-     * <p>
-     * TODO: Replace in-memory user lookup with AccountDatabase.authenticateUser()
      */
     private void handleLogin() {
         String username = usernameField.getText();
@@ -207,8 +197,8 @@ public class LoginPopup extends JFrame {
 
         username = username.trim();
 
-        // TODO: Replace this with: AccountDatabase.authenticateUser(username, password)
-        if (!userDatabase.containsKey(username)) {
+        // Check if username exists
+        if (!user.userExists(username)) {
             String message = "Username '" + username + "' does not exist.\nPlease create an account or try another username.";
             displayMessage(message, false);
             usernameField.selectAll();
@@ -216,8 +206,8 @@ public class LoginPopup extends JFrame {
             return;
         }
 
-        String storedPassword = userDatabase.get(username);
-        if (!storedPassword.equals(password)) {
+        // Validate credentials
+        if (!user.login(username, password)) {
             String message = "Incorrect password for username '" + username + "'.\nPlease try again.";
             displayMessage(message, false);
             passwordField.setText("");
@@ -241,8 +231,6 @@ public class LoginPopup extends JFrame {
     /**
      * Handles the create account button action.
      * Validates input and creates a new account.
-     * <p>
-     * TODO: Replace in-memory storage with AccountDatabase.createAccount()
      */
     private void handleCreateAccount() {
         String username = usernameField.getText();
@@ -279,8 +267,8 @@ public class LoginPopup extends JFrame {
             return;
         }
 
-        // TODO: Replace this with: if (AccountDatabase.userExists(username))
-        if (userDatabase.containsKey(username)) {
+        // Check if username is already taken
+        if (user.userExists(username)) {
             String message = "Username '" + username + "' is already taken.\nPlease choose a different username.";
             displayMessage(message, false);
             usernameField.selectAll();
@@ -288,8 +276,8 @@ public class LoginPopup extends JFrame {
             return;
         }
 
-        // TODO: Replace this with: AccountDatabase.createAccount(username, password)
-        userDatabase.put(username, password);
+        // Create the account
+        user.createAccount(username, password);
 
         String successMessage = "Account created successfully!\n\nUsername: " + username +
                 "\n\nYou can now login with your new credentials.";

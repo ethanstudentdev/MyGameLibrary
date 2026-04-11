@@ -10,7 +10,9 @@ import java.io.IOException;
 
 public class GameParser {
     public static void main(){
-        //XML file name
+        //XML DEFAULT FILE NAME
+        String fileName = "bgg90Games.xml";
+        //DEFAULT FILE PATH
         String filePath = "C:\\Users\\Ethan\\IdeaProjects\\MyGameLibrary\\assets\\bgg90Games.xml";
 
         //Master GameCollection object stores all games from path XML
@@ -72,7 +74,26 @@ public class GameParser {
                         game.setDescription(descriptionElement.getTextContent());
                     }
                 }
-                //End name children description nodes logic//
+                //End children description nodes logic//
+
+                //Logic for children link nodes//
+                NodeList linkList = itemElement.getElementsByTagName("link");
+
+                //Loops through link nodes
+                for(int j = 0 ; j < linkList.getLength() ; j++)
+                {
+                    Node linkNode = linkList.item(j);
+                    //Logic for boardgamecategory nodes
+                    if(linkNode.getNodeType() == Node.ELEMENT_NODE)
+                    {
+                        Element genreElement = (Element) linkNode;
+                        if ("boardgamecategory".equals(genreElement.getAttribute("type")))
+                        {
+                            game.addGenre(genreElement.getAttribute("value"));
+                        }
+                    }
+                }
+                //End children link nodes logic//
 
                 //Adds BoardGame to master collection
                 master.addGame(game);
@@ -81,7 +102,10 @@ public class GameParser {
         } catch (ParserConfigurationException | IOException | SAXException e) {
             throw new RuntimeException(e);
         }
-        //Debug method call
+
+        //Debug sort method call
+        master.games.sort(BoardGame.byTitle);
+        //Debug print method call
         master.printAllGames();
     }
 }

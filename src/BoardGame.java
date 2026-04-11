@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Comparator;
+
 /**
  * A class that represents a single BoardGame object
  *
@@ -11,7 +13,7 @@ public class BoardGame {
     private String description;
     private RatingList ratings;
     private ReviewList reviews;
-    private String genre;
+    private final ArrayList<String> genre;
 
     //Constructors
 
@@ -20,15 +22,14 @@ public class BoardGame {
      *
      * @param title        The title of the Board Game
      * @param description  The summary description of the Board Game
-     * @param genre        The genre of the Board Game
      * @param ratings      All the ratings of the board game
      * @param reviews      All the reviews of the board game
      */
-    public BoardGame(String title, String description, String genre, RatingList ratings, ReviewList reviews)
+    public BoardGame(String title, String description, RatingList ratings, ReviewList reviews)
     {
         this.title = title;
         this.description = description;
-        this.genre = genre;
+        this.genre = new ArrayList<String>();
         this.ratings = ratings;
         this.reviews = reviews;
     }
@@ -40,7 +41,7 @@ public class BoardGame {
     {
         this.title = "no title found";
         this.description = "no description found";
-        this.genre = "no genre found";
+        this.genre = new ArrayList<String>();
     }
 
     //Methods
@@ -54,11 +55,11 @@ public class BoardGame {
     public String getDescription(){return description;}
 
     /**
-     * Gets the genre of a BoardGame object
+     * Gets the list of genres of a BoardGame object
      *
-     * @return The genre of the BoardGame
+     * @return The arraylist of genres of the BoardGame
      */
-    public String getGenre(){return genre;}
+    public ArrayList<String> getGenre() {return genre;}
 
     /**
      * Gets the title for a BoardGame object
@@ -66,6 +67,15 @@ public class BoardGame {
      * @return String representing title of a Board Game
      */
     public String getTitle(){return title;}
+
+    //Adders
+
+    /**
+     * Adds a genre to the genres
+     *
+     * @param aGenre The genre that is being added to the genre arrayList object
+     */
+    public void addGenre(String aGenre) {genre.add(aGenre);}
 
     //Setters//
     /**
@@ -82,5 +92,10 @@ public class BoardGame {
      */
     public void setDescription(String description){this.description = description;}
 
-
+    //Comparators
+    /**
+     *  Compares a board game to another by its title
+     */
+    public static Comparator<BoardGame> byTitle =
+            Comparator.comparing(BoardGame::getTitle);
 }

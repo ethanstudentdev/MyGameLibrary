@@ -8,7 +8,7 @@ public class GameCollection {
     //Fields
 
     private String title;
-    private ArrayList<BoardGame> games;
+    final ArrayList<BoardGame> games;
 
     //Constructors
 
@@ -62,6 +62,9 @@ public class GameCollection {
      */
     public String getTitle() {return title;}
 
+    /**
+     * Debug method to print all games in collection and their info to the console
+     */
     public void printAllGames()
     {
         int i = 0;
@@ -73,6 +76,11 @@ public class GameCollection {
             System.out.println(game.getTitle());
             System.out.println("Description");
             System.out.println(game.getDescription());
+            System.out.println("Genres");
+            for(String genre : game.getGenre())
+            {
+                System.out.println(genre);
+            }
             System.out.println();
         }
     }

@@ -27,18 +27,18 @@ public class RoundedCornerButton extends JButton implements ActionListener {
 
     /**
      * The constructor for this type of button.
-     * It sets the label, the border, and in the future will set the redirect
+     * It sets the label and provides a clean, modern button appearance.
      * Every button of this type should have a label because the user needs
-     * to know where it will redirect. Therefore, we don't need a constructor
-     * that does not have a string label.
+     * to know what action it performs.
      *
-     * @param label the string to label to button
+     * @param label the string to label the button
      */
     public RoundedCornerButton(String label){
         super(label);
-        super.setBorder(new LineBorder(Color.GRAY, 15, true));
-
-        //this.redirect = redirect;
+        // Clean border with subtle rounding effect
+        super.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+        super.setFocusPainted(false);
+        super.setContentAreaFilled(true);
     }
 
     /**

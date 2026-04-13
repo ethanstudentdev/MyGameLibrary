@@ -17,8 +17,8 @@ public class LoginPopup extends JFrame {
     // UI Components
     private JTextField usernameField;
     private JPasswordField passwordField;
-    private JButton loginButton;
-    private JButton createAccountButton;
+    private RoundedCornerButton loginButton;
+    private RoundedCornerButton createAccountButton;
     private JLabel messageLabel;
 
     // Authentication listener callback
@@ -65,90 +65,139 @@ public class LoginPopup extends JFrame {
      * Creates and layouts all GUI elements for the login window.
      */
     private void initializeUI() {
+        // Modern color scheme
+        Color backgroundColor = new Color(250, 250, 252);
+        Color accentColor = new Color(0, 122, 204);
+        Color textColor = new Color(33, 37, 41);
+        Color inputBgColor = new Color(255, 255, 255);
+        Color buttonColor = accentColor;
+        Color buttonHoverColor = new Color(0, 140, 230);
+        Color createButtonColor = new Color(40, 167, 69);
+        Color createButtonHoverColor = new Color(34, 139, 57);
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(450, 280);
+        setSize(500, 370);
         setLocationRelativeTo(null);
         setResizable(false);
 
         // Main panel with BorderLayout for simple, stable layout
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(new Color(240, 240, 240));
+        mainPanel.setBackground(backgroundColor);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         // ===== TOP SECTION: Title =====
         JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        titlePanel.setBackground(new Color(240, 240, 240));
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        titlePanel.setBackground(backgroundColor);
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
         JLabel titleLabel = new JLabel("Login to My Game Library");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        titleLabel.setForeground(accentColor);
         titlePanel.add(titleLabel);
 
         // ===== MIDDLE SECTION: Form =====
         JPanel formPanel = new JPanel();
         formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
-        formPanel.setBackground(new Color(240, 240, 240));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(15, 30, 15, 30));
+        formPanel.setBackground(backgroundColor);
+        formPanel.setBorder(BorderFactory.createEmptyBorder(10, 40, 10, 40));
 
         // Username row
         JPanel usernameRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        usernameRow.setBackground(new Color(240, 240, 240));
+        usernameRow.setBackground(backgroundColor);
         JLabel usernameLabel = new JLabel("Username: ");
-        usernameLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        usernameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        usernameLabel.setForeground(textColor);
         usernameLabel.setPreferredSize(new Dimension(90, 25));
         usernameField = new JTextField(20);
-        usernameField.setFont(new Font("Arial", Font.PLAIN, 12));
-        usernameField.setPreferredSize(new Dimension(200, 25));
+        usernameField.setFont(new Font("Arial", Font.PLAIN, 14));
+        usernameField.setPreferredSize(new Dimension(250, 30));
+        usernameField.setBackground(inputBgColor);
+        usernameField.setForeground(textColor);
+        usernameField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(206, 212, 218), 1),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
         usernameRow.add(usernameLabel);
         usernameRow.add(usernameField);
 
         // Password row
         JPanel passwordRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        passwordRow.setBackground(new Color(240, 240, 240));
+        passwordRow.setBackground(backgroundColor);
         JLabel passwordLabel = new JLabel("Password: ");
-        passwordLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        passwordLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        passwordLabel.setForeground(textColor);
         passwordLabel.setPreferredSize(new Dimension(90, 25));
         passwordField = new JPasswordField(20);
-        passwordField.setFont(new Font("Arial", Font.PLAIN, 12));
-        passwordField.setPreferredSize(new Dimension(200, 25));
+        passwordField.setFont(new Font("Arial", Font.PLAIN, 14));
+        passwordField.setPreferredSize(new Dimension(250, 30));
+        passwordField.setBackground(inputBgColor);
+        passwordField.setForeground(textColor);
+        passwordField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(206, 212, 218), 1),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
         passwordRow.add(passwordLabel);
         passwordRow.add(passwordField);
 
         // Message label - fixed size
         messageLabel = new JLabel(" ");
-        messageLabel.setFont(new Font("Arial", Font.ITALIC, 11));
-        messageLabel.setForeground(new Color(200, 0, 0));
+        messageLabel.setFont(new Font("Arial", Font.ITALIC, 12));
+        messageLabel.setForeground(new Color(220, 53, 69));
         messageLabel.setVerticalAlignment(JLabel.TOP);
         messageLabel.setHorizontalAlignment(JLabel.LEFT);
-        messageLabel.setPreferredSize(new Dimension(290, 60));
-        messageLabel.setMaximumSize(new Dimension(290, 60));
-        messageLabel.setMinimumSize(new Dimension(290, 60));
+        messageLabel.setPreferredSize(new Dimension(340, 50));
+        messageLabel.setMaximumSize(new Dimension(340, 50));
+        messageLabel.setMinimumSize(new Dimension(340, 50));
 
         formPanel.add(usernameRow);
-        formPanel.add(Box.createVerticalStrut(10));
+        formPanel.add(Box.createVerticalStrut(15));
         formPanel.add(passwordRow);
-        formPanel.add(Box.createVerticalStrut(10));
+        formPanel.add(Box.createVerticalStrut(15));
         formPanel.add(messageLabel);
 
         // ===== BOTTOM SECTION: Buttons =====
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        buttonPanel.setBackground(new Color(240, 240, 240));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
+        buttonPanel.setBackground(backgroundColor);
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
-        loginButton = new JButton("Login");
-        loginButton.setPreferredSize(new Dimension(100, 35));
+        loginButton = new RoundedCornerButton("Login");
+        loginButton.setPreferredSize(new Dimension(140, 40));
         loginButton.setFont(new Font("Arial", Font.BOLD, 12));
-        loginButton.setBackground(new Color(70, 130, 180));
+        loginButton.setBackground(buttonColor);
         loginButton.setForeground(Color.WHITE);
         loginButton.setFocusPainted(false);
+        loginButton.setBorderPainted(false);
         loginButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        buttonPanel.add(loginButton);
 
-        createAccountButton = new JButton("Create Account");
-        createAccountButton.setPreferredSize(new Dimension(130, 35));
+        // Add hover effect for login button
+        loginButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                loginButton.setBackground(buttonHoverColor);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                loginButton.setBackground(buttonColor);
+            }
+        });
+
+        createAccountButton = new RoundedCornerButton("Create Account");
+        createAccountButton.setPreferredSize(new Dimension(140, 40));
         createAccountButton.setFont(new Font("Arial", Font.BOLD, 12));
-        createAccountButton.setBackground(new Color(100, 150, 100));
+        createAccountButton.setBackground(createButtonColor);
         createAccountButton.setForeground(Color.WHITE);
         createAccountButton.setFocusPainted(false);
+        createAccountButton.setBorderPainted(false);
         createAccountButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Add hover effect for create account button
+        createAccountButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                createAccountButton.setBackground(createButtonHoverColor);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                createAccountButton.setBackground(createButtonColor);
+            }
+        });
+
+        buttonPanel.add(loginButton);
         buttonPanel.add(createAccountButton);
 
         // ===== ADD ALL PANELS TO MAIN PANEL =====

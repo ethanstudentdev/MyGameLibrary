@@ -1,120 +1,328 @@
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * DashboardView is the view the user reaches after login,
- * it allows the user to search (through text or genre button)
- * in addition to the standard My Collections/Dashboard/Logout
+ * DashboardView is the view the user reaches after login.
+ * It allows the user to search games by text or genre and provides
+ * quick access to My Collections, Dashboard, and Logout.
  *
  * @author Levi Snellgrove
+ * @author Nathaniel Chan
  */
-public class DashboardView extends JFrame{
-    //Private ui elements, needed for initializing then adding behavior in different scopes
+public class DashboardView extends JFrame {
+    private final String username;
+    private final MyGameLibraryApp app;
+
     private RoundedCornerButton collections;
     private RoundedCornerButton dashboard;
     private RoundedCornerButton logout;
 
-    private RoundedCornerButton coop;
-    private RoundedCornerButton competitive;
-    private RoundedCornerButton strategy;
-    private RoundedCornerButton fantasy;
-
+    private List<RoundedCornerButton> categoryButtons;
     private JTextField searchBar;
+    private RoundedCornerButton leftArrow;
+    private RoundedCornerButton rightArrow;
 
-    /**
-     * The constructor that initializes the UI and sets up its behavior
-     */
-    public DashboardView()
-    {
+    public DashboardView(String username, MyGameLibraryApp app) {
+        this.username = username;
+        this.app = app;
         initializeUI();
         initializeBehavior();
     }
 
-    /**
-     * UI initialization.
-     * Makes a frame with the buttons and search bar needed for the required functions.
-     */
-    public void initializeUI(){
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    public void initializeUI() {
+        // Modern color scheme
+        Color backgroundColor = new Color(250, 250, 252);
+        Color accentColor = new Color(0, 122, 204);
+        Color textColor = new Color(33, 37, 41);
+        Color buttonColor = new Color(108, 117, 125);
+        Color buttonHoverColor = new Color(90, 98, 104);
+        Color logoutButtonColor = new Color(220, 53, 69);
+        Color logoutButtonHoverColor = new Color(200, 35, 51);
 
-        JFrame frame = new JFrame("MyGameLibrary - Dashboard");
-        frame.setLayout(new BorderLayout());
-        //setting frame size
-        frame.setSize(screenSize.width, screenSize.height);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("My Game Library - Dashboard");
+        setLayout(new BorderLayout());
+        // Set to full screen
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setUndecorated(false); // Keep window decorations for closing/minimizing
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        //Setting up panels/subpanels for specific ui layout
+        // Top panel - Header with navigation
         JPanel top = new JPanel(new BorderLayout());
-        JPanel topSubpanel = new JPanel(new GridLayout(1,3,5,0));
-        JPanel middle = new JPanel();
-        JPanel middleSubpanel = new JPanel(new GridLayout(2,1,0,10));
-        JPanel bottom = new JPanel(new GridLayout(1, 4, 15, 10));
+        top.setBackground(backgroundColor);
+        top.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // setting up panel sizing
-        top.setPreferredSize(new Dimension(screenSize.width, ((2 * screenSize.height )/ 21) ));
-        middle.setPreferredSize(new Dimension(screenSize.width, ((9 * screenSize.height) / 21)));
-        bottom.setPreferredSize(new Dimension(screenSize.width, ((10 * screenSize.height) / 21)));
+        JLabel titleLabel = new JLabel("Dashboard - " + username);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24)); // Increased font size
+        titleLabel.setForeground(textColor);
+        titleLabel.setPreferredSize(new Dimension(300, 50));
+        top.add(titleLabel, BorderLayout.WEST);
 
-        topSubpanel.setPreferredSize(new Dimension((9 * screenSize.width )/ 21, ((2 * screenSize.height )/ 21) ));
-        middleSubpanel.setPreferredSize(new Dimension(((11 * screenSize.width) / 21), ((9 * screenSize.height) / 21) ));
+        // Navigation buttons panel
+        JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 0)); // Increased spacing between buttons
+        navPanel.setBackground(backgroundColor);
 
-        //adding panels to frame
-        frame.add(top, BorderLayout.NORTH);
-        frame.add(middle, BorderLayout.CENTER);
-        frame.add(bottom, BorderLayout.SOUTH);
+        collections = createStyledButton("My Collections", buttonColor, Color.WHITE, buttonHoverColor);
+        dashboard = createStyledButton("Dashboard", buttonColor, Color.WHITE, buttonHoverColor);
+        logout = createStyledButton("Logout", logoutButtonColor, Color.WHITE, logoutButtonHoverColor);
 
-        //Creating top right buttons
-        collections = new RoundedCornerButton("My Collections");
-        dashboard = new RoundedCornerButton("Dashboard");
-        logout = new RoundedCornerButton("Logout");
+        navPanel.add(collections);
+        navPanel.add(dashboard);
+        navPanel.add(logout);
 
-        //Creating search bar and label
-        searchBar = new JTextField("Search");
-        searchBar.setBorder(new LineBorder(Color.GRAY, 15, true));
+        top.add(navPanel, BorderLayout.EAST);
+
+        // Middle panel - Search functionality
+        JPanel middle = new JPanel(new GridBagLayout()); // Use GridBagLayout for perfect centering
+        middle.setBackground(backgroundColor);
+        middle.setBorder(BorderFactory.createEmptyBorder(40, 20, 40, 20));
+
+        JPanel searchPanel = new JPanel();
+        searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.Y_AXIS));
+        searchPanel.setBackground(backgroundColor);
+
+        // Create search bar with proper placeholder behavior
+        searchBar = new JTextField();
+        searchBar.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(accentColor, 2),
+                BorderFactory.createEmptyBorder(12, 20, 12, 20) // Increased padding
+        ));
         searchBar.setHorizontalAlignment(SwingConstants.CENTER);
+        searchBar.setFont(new Font("Arial", Font.PLAIN, 18)); // Increased font size
+        searchBar.setPreferredSize(new Dimension(500, 50)); // Made search bar bigger
+        searchBar.setMaximumSize(new Dimension(500, 50));
+        searchBar.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Set up placeholder text behavior
+        setupSearchBarPlaceholder();
 
         JLabel genreSearchLabel = new JLabel("Browse by game type");
         genreSearchLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        genreSearchLabel.setFont(new Font("Arial", Font.BOLD, 18)); // Increased font size
+        genreSearchLabel.setForeground(textColor);
+        genreSearchLabel.setBorder(BorderFactory.createEmptyBorder(30, 0, 10, 0));
+        genreSearchLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        genreSearchLabel.setFont(new Font("Arial", Font.PLAIN, 18));
+        searchPanel.add(searchBar);
+        searchPanel.add(Box.createVerticalStrut(10));
+        searchPanel.add(genreSearchLabel);
 
-        //creating genre search buttons
-        coop = new RoundedCornerButton("Co-op");
-        competitive = new RoundedCornerButton("Competitive");
-        strategy = new RoundedCornerButton("Strategy");
-        fantasy = new RoundedCornerButton("Fantasy");
+        // Category button grid
+        JPanel gridPanel = new JPanel();
+        gridPanel.setLayout(new BoxLayout(gridPanel, BoxLayout.X_AXIS));
+        gridPanel.setBackground(backgroundColor);
 
-        //adding/filling subpanels
-        top.add(topSubpanel, BorderLayout.EAST);
-        topSubpanel.add(collections);
-        topSubpanel.add(dashboard);
-        topSubpanel.add(logout);
+        String categoryXmlPath = "assets/bgg90Games.xml";
+        List<GameParser.CategoryCount> categoryCounts = GameParser.getCategoryCountsFromFile(categoryXmlPath);
 
-        middle.add(middleSubpanel);
-        middleSubpanel.add(searchBar);
-        middleSubpanel.add(genreSearchLabel);
+        //Default Example Buttons if the xml isn't found
+        if (categoryCounts.isEmpty()) {
+            categoryCounts = List.of(
+                    new GameParser.CategoryCount("Co-op", 0),
+                    new GameParser.CategoryCount("Competitive", 0),
+                    new GameParser.CategoryCount("Strategy", 0),
+                    new GameParser.CategoryCount("Fantasy", 0)
+            );
+        }
 
-        bottom.add(coop);
-        bottom.add(competitive);
-        bottom.add(strategy);
-        bottom.add(fantasy);
+        int maxLabelLength = 0;
+        for (GameParser.CategoryCount categoryCount : categoryCounts) {
+            maxLabelLength = Math.max(maxLabelLength, categoryCount.toString().length());
+        }
+        int buttonWidth = Math.max(180, maxLabelLength * 11 + 40);
+        int columnWidth = buttonWidth + 20;
 
-        // Make the frame visible
-        frame.setVisible(true);
+        categoryButtons = new ArrayList<>();
+        for (int i = 0; i < categoryCounts.size(); i += 3) {
+            JPanel column = new JPanel(new GridLayout(3, 1, 0, 20));
+            column.setBackground(backgroundColor);
+            for (int row = 0; row < 3; row++) {
+                int index = i + row;
+                if (index < categoryCounts.size()) {
+                    GameParser.CategoryCount categoryCount = categoryCounts.get(index);
+                    String label = categoryCount.toString();
+                    RoundedCornerButton categoryButton = createStyledButton(label, accentColor, Color.WHITE, new Color(0, 140, 230), buttonWidth, 55);
+                    categoryButton.putClientProperty("categoryName", categoryCount.getName());
+                    categoryButtons.add(categoryButton);
+                    column.add(categoryButton);
+                } else {
+                    column.add(Box.createVerticalGlue());
+                }
+            }
+            gridPanel.add(column);
+            if (i + 3 < categoryCounts.size()) {
+                gridPanel.add(Box.createHorizontalStrut(20));
+            }
+        }
+
+        JScrollPane categoryScrollPane = new JScrollPane(gridPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        categoryScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        categoryScrollPane.setPreferredSize(new Dimension(3 * columnWidth - 20, 240));
+        categoryScrollPane.getViewport().setBackground(backgroundColor);
+        categoryScrollPane.setOpaque(false);
+        categoryScrollPane.getViewport().setOpaque(false);
+
+        leftArrow = createStyledButton("<", buttonColor, Color.WHITE, buttonHoverColor, 60, 55);
+        rightArrow = createStyledButton(">", buttonColor, Color.WHITE, buttonHoverColor, 60, 55);
+
+        leftArrow.addActionListener(e -> scrollCategoryPanel(categoryScrollPane, -columnWidth));
+        rightArrow.addActionListener(e -> scrollCategoryPanel(categoryScrollPane, columnWidth));
+
+        updateArrowStates(categoryScrollPane);
+
+        JPanel categoryNavigationPanel = new JPanel(new BorderLayout(25, 0));
+        categoryNavigationPanel.setBackground(backgroundColor);
+        categoryNavigationPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        categoryNavigationPanel.add(leftArrow, BorderLayout.WEST);
+        categoryNavigationPanel.add(categoryScrollPane, BorderLayout.CENTER);
+        categoryNavigationPanel.add(rightArrow, BorderLayout.EAST);
+
+        searchPanel.add(Box.createVerticalStrut(20));
+        searchPanel.add(categoryNavigationPanel);
+
+        // Add search panel to center of middle panel
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.NORTH;
+        middle.add(searchPanel, gbc);
+
+        // Add panels to main frame
+        add(top, BorderLayout.NORTH);
+        add(middle, BorderLayout.CENTER);
+
+        // Set overall background
+        getContentPane().setBackground(backgroundColor);
     }
 
-    /**
-     * Adds behavior to the UI elements.
-     */
-    public void initializeBehavior(){
-        collections.addActionListener(collections);
-        dashboard.addActionListener(dashboard);
-        logout.addActionListener(logout);
+    private RoundedCornerButton createStyledButton(String text, Color bgColor, Color fgColor, Color hoverColor) {
+        return createStyledButton(text, bgColor, fgColor, hoverColor, 180, 55);
+    }
 
-        coop.addActionListener(coop);
-        competitive.addActionListener(competitive);
-        strategy.addActionListener(strategy);
-        fantasy.addActionListener(fantasy);
+    private RoundedCornerButton createStyledButton(String text, Color bgColor, Color fgColor, Color hoverColor, int width, int height) {
+        RoundedCornerButton button = new RoundedCornerButton(text);
+        button.setBackground(bgColor);
+        button.setForeground(fgColor);
+        button.setFont(new Font("Arial", Font.BOLD, 16)); // Increased font size
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setPreferredSize(new Dimension(width, height));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Add hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(hoverColor);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(bgColor);
+            }
+        });
+
+        return button;
+    }
+
+    private void scrollCategoryPanel(JScrollPane scrollPane, int offset) {
+        JViewport viewport = scrollPane.getViewport();
+        Point position = viewport.getViewPosition();
+        int newX = position.x + offset;
+        newX = Math.max(0, Math.min(newX, scrollPane.getViewport().getView().getWidth() - viewport.getWidth()));
+        viewport.setViewPosition(new Point(newX, position.y));
+        updateArrowStates(scrollPane);
+    }
+
+    private void updateArrowStates(JScrollPane scrollPane) {
+        // Arrows are always enabled for scrolling
+    }
+
+    private void setupSearchBarPlaceholder() {
+        final String placeholderText = "Search games...";
+        final Color placeholderColor = new Color(150, 150, 150);
+        final Color textColor = Color.BLACK;
+
+        // Set initial placeholder state
+        searchBar.setText(placeholderText);
+        searchBar.setForeground(placeholderColor);
+
+        searchBar.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                if (searchBar.getText().equals(placeholderText)) {
+                    searchBar.setText("");
+                    searchBar.setForeground(textColor);
+                }
+            }
+
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                if (searchBar.getText().trim().isEmpty()) {
+                    searchBar.setText(placeholderText);
+                    searchBar.setForeground(placeholderColor);
+                }
+            }
+        });
+    }
+
+    public void initializeBehavior() {
+        collections.addActionListener(e -> openCollections());
+        dashboard.addActionListener(e -> openDashboard());
+        logout.addActionListener(e -> performLogout());
+
+        if (categoryButtons != null) {
+            for (RoundedCornerButton categoryButton : categoryButtons) {
+                categoryButton.addActionListener(e -> {
+                    String categoryName = (String) categoryButton.getClientProperty("categoryName");
+                    if (categoryName != null) {
+                        filterByGameType(categoryName);
+                    } else {
+                        filterByGameType(categoryButton.getText());
+                    }
+                });
+            }
+        }
+
+        searchBar.addActionListener(e -> {
+            String query = searchBar.getText();
+            if (!query.equals("Search games...") && !query.trim().isEmpty()) {
+                searchGames(query);
+            }
+        });
+    }
+
+    private void openCollections() {
+        app.showCollectionsView(username);
+        dispose();
+    }
+
+    private void openDashboard() {
+        // TODO: refresh or show the dashboard overview
+    }
+
+    private void performLogout() {
+        int result = JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to logout?",
+                "Confirm Logout",
+                JOptionPane.YES_NO_OPTION);
+
+        if (result == JOptionPane.YES_OPTION) {
+            app.onLogout();
+        }
+    }
+
+    private void searchGames(String query) {
+        if (query == null || query.trim().isEmpty() || query.equals("Search games...")) {
+            return; // Don't search if it's placeholder text or empty
+        }
+        // TODO: implement search logic for the dashboard search bar
+        System.out.println("Searching for: " + query);
+    }
+
+    private void filterByGameType(String type) {
+        // TODO: implement genre filtering for game type buttons
     }
 }

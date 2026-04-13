@@ -13,7 +13,8 @@ import javax.swing.*;
 public class MyGameLibraryApp implements LoginPopup.LoginListener {
 
     private LoginPopup loginPopup;
-    private MainWindow mainWindow;
+    private DashboardView dashboardView;
+    private CollectionsView collectionsView;
     private String currentUser;
 
     /**
@@ -35,26 +36,44 @@ public class MyGameLibraryApp implements LoginPopup.LoginListener {
     }
 
     /**
-     * Shows the main application window after successful login.
+     * Shows the dashboard view after successful login.
      * This window is hidden until user successfully authenticates.
      *
      * @param username the username of the logged-in user
      */
-    private void showMainWindow(String username) {
-        mainWindow = new MainWindow(username, this);
-        mainWindow.setVisible(true);
+    public void showDashboardView(String username) {
+        if (collectionsView != null) {
+            collectionsView.dispose();
+            collectionsView = null;
+        }
+        dashboardView = new DashboardView(username, this);
+        dashboardView.setVisible(true);
+    }
+    
+    /**
+     * Shows the collections view.
+     *
+     * @param username the username of the logged-in user
+     */
+    public void showCollectionsView(String username) {
+        if (dashboardView != null) {
+            dashboardView.dispose();
+            dashboardView = null;
+        }
+        collectionsView = new CollectionsView(username, this);
+        collectionsView.setVisible(true);
     }
 
     /**
      * Called when a user successfully logs in.
-     * Shows the main window and hides the login window.
+     * Shows the dashboard view and hides the login window.
      *
      * @param username the username of the authenticated user
      */
     @Override
     public void onLoginSuccess(String username) {
         currentUser = username;
-        showMainWindow(username);
+        showDashboardView(username);
     }
 
     /**
@@ -72,9 +91,13 @@ public class MyGameLibraryApp implements LoginPopup.LoginListener {
      */
     public void onLogout() {
         currentUser = null;
-        if (mainWindow != null) {
-            mainWindow.dispose();
-            mainWindow = null;
+        if (dashboardView != null) {
+            dashboardView.dispose();
+            dashboardView = null;
+        }
+        if (collectionsView != null) {
+            collectionsView.dispose();
+            collectionsView = null;
         }
         showLoginWindow();
     }

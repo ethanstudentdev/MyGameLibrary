@@ -9,19 +9,10 @@ import java.io.File;
 import java.io.IOException;
 
 public class GameParser {
-    public static void main(){
-        //XML DEFAULT FILE NAME
-        String fileName = "bgg90Games.xml";
-        //DEFAULT FILE PATH
-        String filePath = "C:\\Users\\Ethan\\IdeaProjects\\MyGameLibrary\\assets\\bgg90Games.xml";
-
-        //Master GameCollection object stores all games from path XML
-        GameCollection master = new GameCollection("allGames") ;
-
+    public GameCollection parse(File gameFile)
+    {
+        GameCollection collection = new GameCollection("allGames");
         try{
-            //Setting up infile
-            File gameFile = new File(filePath);
-
             //Building the doc to parse
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = factory.newDocumentBuilder();
@@ -76,6 +67,20 @@ public class GameParser {
                 }
                 //End children description nodes logic//
 
+                //Logic for children image nodes//
+                NodeList imageList = itemElement.getElementsByTagName("image");
+                Node imageNode = imageList.item(0);
+                if(imageNode.getNodeType() == Node.ELEMENT_NODE)
+                {
+                    Element imageElement = (Element) imageNode;
+                    //Sets an image if there is one
+                    if(!(imageElement.getTextContent()).isBlank())
+                    {
+                        game.setImage(imageElement.getTextContent());
+                    }
+                }
+                //End children image nodes logic//
+
                 //Logic for children link nodes//
                 NodeList linkList = itemElement.getElementsByTagName("link");
 
@@ -95,17 +100,14 @@ public class GameParser {
                 }
                 //End children link nodes logic//
 
-                //Adds BoardGame to master collection
-                master.addGame(game);
+                //Adds BoardGame to collection
+                collection.addGame(game);
             }
 
         } catch (ParserConfigurationException | IOException | SAXException e) {
             throw new RuntimeException(e);
         }
-
-        //Debug sort method call
-        master.games.sort(BoardGame.byTitle);
-        //Debug print method call
-        master.printAllGames();
+        //Returns the collection
+        return collection;
     }
 }

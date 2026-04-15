@@ -74,6 +74,8 @@ public class GameCollection {
             System.out.println("Game # : " + i);
             System.out.println("Title");
             System.out.println(game.getTitle());
+            System.out.println("Image Link");
+            System.out.println(game.getImage());
             System.out.println("Description");
             System.out.println(game.getDescription());
             System.out.println("Genres");
@@ -81,6 +83,8 @@ public class GameCollection {
             {
                 System.out.println(genre);
             }
+            System.out.println("Average Rating");
+            System.out.println(game.getAvgRating());
             System.out.println();
         }
     }

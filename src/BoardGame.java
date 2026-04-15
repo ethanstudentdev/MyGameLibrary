@@ -17,7 +17,6 @@ public class BoardGame {
     private String publisher;
     private final ArrayList<String> genre;
 
-
     //Constructors
 
     /**

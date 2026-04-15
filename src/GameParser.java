@@ -8,7 +8,20 @@ import org.xml.sax.SAXException;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * A class that implements parsing an XML database file
+ *
+ * @author Ethan Johnson
+ */
 public class GameParser {
+    /**
+     * this method parses a complete XML file and populates a GameCollection object with all of the BoardGame
+     * entries contained within the XML file
+     *
+     * @param gameFile The XML file to be parsed in the form of a Java File type
+     * @return A game collection representing all games to be used for searching, sorting, and all other functionality
+     *         of the application
+     */
     public GameCollection parse(File gameFile)
     {
         GameCollection collection = new GameCollection("allGames");

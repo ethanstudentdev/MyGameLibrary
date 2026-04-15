@@ -1,5 +1,10 @@
 import java.util.ArrayList;
 
+/**
+ * A class that represents a list of ratings for a board game and has associated methods
+ *
+ * @author Ethan Johnson
+ */
 public class RatingList {
     //Fields
     final ArrayList<Integer> ratings;

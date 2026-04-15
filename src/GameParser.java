@@ -96,6 +96,10 @@ public class GameParser {
                         {
                             game.addGenre(genreElement.getAttribute("value"));
                         }
+                        if ("boardgamepublisher".equals(genreElement.getAttribute("type")))
+                        {
+                            game.setPublisher(genreElement.getAttribute("value"));
+                        }
                     }
                 }
                 //End children link nodes logic//

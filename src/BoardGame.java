@@ -14,6 +14,7 @@ public class BoardGame {
     private RatingList ratings;
     private ReviewList reviews;
     private String image;
+    private String publisher;
     private final ArrayList<String> genre;
 
 
@@ -27,7 +28,7 @@ public class BoardGame {
      * @param ratings      All the ratings of the board game
      * @param reviews      All the reviews of the board game
      */
-    public BoardGame(String title, String description, RatingList ratings, ReviewList reviews, String image)
+    public BoardGame(String title, String description, RatingList ratings, ReviewList reviews, String image, String publisher)
     {
         this.title = title;
         this.description = description;
@@ -35,6 +36,7 @@ public class BoardGame {
         this.ratings = ratings;
         this.reviews = reviews;
         this.image = image;
+        this.publisher = publisher;
     }
 
     /**
@@ -45,6 +47,7 @@ public class BoardGame {
         this.title = "no title found";
         this.description = "no description found";
         this.image = "no image found";
+        this.publisher = "no publisher found";
         this.ratings = new RatingList();
         this.reviews = new ReviewList();
         this.genre = new ArrayList<String>();
@@ -80,6 +83,13 @@ public class BoardGame {
      * @return String representing title of a Board Game
      */
     public String getImage(){return image;}
+
+    /**
+     * Gets the publisher for a BoardGame object
+     *
+     * @return String representing the publisher of a Board Game
+     */
+    public String getPublisher(){return publisher;}
 
     //Adders
 
@@ -118,6 +128,8 @@ public class BoardGame {
      * @param image The description of the Board Game
      */
     public void setImage(String image){this.image = image;}
+
+    public void setPublisher(String publisher){this.publisher = publisher;}
 
     //Returns//
     /**

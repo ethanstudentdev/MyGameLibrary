@@ -83,6 +83,8 @@ public class GameCollection {
             {
                 System.out.println(genre);
             }
+            System.out.println("Publisher");
+            System.out.println(game.getPublisher());
             System.out.println("Average Rating");
             System.out.println(game.getAvgRating());
             System.out.println();

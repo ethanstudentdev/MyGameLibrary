@@ -11,8 +11,8 @@ public class BoardGame {
 
     private String title;
     private String description;
-    private RatingList ratings;
-    private ReviewList reviews;
+    private final RatingList ratings;
+    private final ReviewList reviews;
     private String image;
     private String publisher;
     private final ArrayList<String> genre;
@@ -66,7 +66,7 @@ public class BoardGame {
     /**
      * Gets the list of genres of a BoardGame object
      *
-     * @return The arraylist of genres of the BoardGame
+     * @return The arraylist of genres of a Board Game
      */
     public ArrayList<String> getGenre() {return genre;}
 
@@ -91,6 +91,20 @@ public class BoardGame {
      */
     public String getPublisher(){return publisher;}
 
+    /**
+     * Gets the ReviewList for a BoardGame object
+     *
+     * @return ReviewList representing all reviews of a board game
+     */
+    public ReviewList getReviews(){return reviews;}
+
+    /**
+     * Gets the RatingList for a BoardGame object
+     *
+     * @return RatingList representing all ratings of a board game
+     */
+    public RatingList getRatings(){return ratings;}
+
     //Adders
 
     /**
@@ -106,6 +120,13 @@ public class BoardGame {
      * @param rating The rating that is being added to the ratingList object
      */
     public void addRating(int rating) {ratings.addRating(rating);}
+
+    /**
+     * Adds a review to the BoardGames reviewList
+     *
+     * @param review The review that is being added to the reviewList object
+     */
+    public void addReview(String review){reviews.addReview(review);}
 
     //Setters//
     /**
@@ -129,6 +150,11 @@ public class BoardGame {
      */
     public void setImage(String image){this.image = image;}
 
+    /**
+     * Sets the publisher of a BoardGame object
+     *
+     * @param publisher The publisher of a Board Game
+     */
     public void setPublisher(String publisher){this.publisher = publisher;}
 
     //Returns//

@@ -1,14 +1,16 @@
 import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A class that represents a single collection of BoardGame objects
  */
 public class GameCollection {
-    //Fields
+    // Fields
 
     private String title;
-    private ArrayList<BoardGame> games;
+    private final ArrayList<BoardGame> games;
 
-    //Constructors
+    // Constructors
 
     /**
      * Constructs a GameCollection object that can
@@ -18,19 +20,19 @@ public class GameCollection {
     public GameCollection(String title)
     {
         this.title = title;
-        this.games = new ArrayList<BoardGame>();
+        this.games = new ArrayList<>();
     }
 
     /**
-     *  Constructs a GameCollection object with no passed parameters and defines defaults
+     * Constructs a GameCollection object with no passed parameters and defines defaults
      */
     public GameCollection()
     {
         this.title = "default";
-        this.games = new ArrayList<BoardGame>();
+        this.games = new ArrayList<>();
     }
 
-    //Methods
+    // Methods
 
     /**
      * Sets the title of the gameCollection object from a single passed parameter
@@ -60,11 +62,17 @@ public class GameCollection {
      */
     public String getTitle() {return title;}
 
-    public void printAllNames(){
-        for(BoardGame game : games)
-        {
+    /**
+     * Gets the list of games in this collection.
+     *
+     * @return List of BoardGame objects in the collection
+     */
+    public List<BoardGame> getGames() {
+        return games;
+    }
+    public void printAllNames() {
+        for(BoardGame game : games) {
             System.out.println(game.getTitle());
         }
     }
-
 }

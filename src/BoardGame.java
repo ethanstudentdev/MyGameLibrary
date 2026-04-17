@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Comparator;
+
 /**
  * A class that represents a single BoardGame object
  */
@@ -7,10 +9,11 @@ public class BoardGame {
 
     private String title;
     private String description;
+    private final RatingList ratings;
+    private final ReviewList reviews;
+    private String image;
     private String publisher;
-    private RatingList ratings;
-    private ReviewList reviews;
-    private String genre;
+    private final ArrayList<String> genre;
 
     //Constructors
 
@@ -19,19 +22,18 @@ public class BoardGame {
      *
      * @param title        The title of the Board Game
      * @param description  The summary description of the Board Game
-     * @param publisher    The publisher of the Board Game
-     * @param genre        The genre of the Board Game
      * @param ratings      All the ratings of the board game
      * @param reviews      All the reviews of the board game
      */
-    public BoardGame(String title, String description, String publisher, String genre, RatingList ratings, ReviewList reviews)
+    public BoardGame(String title, String description, RatingList ratings, ReviewList reviews, String image, String publisher)
     {
         this.title = title;
         this.description = description;
-        this.publisher = publisher;
-        this.genre = genre;
+        this.genre = new ArrayList<String>();
         this.ratings = ratings;
         this.reviews = reviews;
+        this.image = image;
+        this.publisher = publisher;
     }
 
     /**
@@ -41,12 +43,16 @@ public class BoardGame {
     {
         this.title = "no title found";
         this.description = "no description found";
+        this.image = "no image found";
         this.publisher = "no publisher found";
-        this.genre = "no genre found";
+        this.ratings = new RatingList();
+        this.reviews = new ReviewList();
+        this.genre = new ArrayList<String>();
     }
 
     //Methods
 
+    //Getters//
     /**
      * Gets the description of a BoardGame object
      *
@@ -55,19 +61,71 @@ public class BoardGame {
     public String getDescription(){return description;}
 
     /**
-     * Gets the publisher of a BoardGame object
+     * Gets the list of genres of a BoardGame object
      *
-     * @return The publisher of the BoardGame
+     * @return The arraylist of genres of a Board Game
+     */
+    public ArrayList<String> getGenre() {return genre;}
+
+    /**
+     * Gets the title for a BoardGame object
+     *
+     * @return String representing title of a Board Game
+     */
+    public String getTitle(){return title;}
+
+    /**
+     * Gets the image link for a BoardGame object
+     *
+     * @return String representing title of a Board Game
+     */
+    public String getImage(){return image;}
+
+    /**
+     * Gets the publisher for a BoardGame object
+     *
+     * @return String representing the publisher of a Board Game
      */
     public String getPublisher(){return publisher;}
 
     /**
-     * Gets the genre of a BoardGame object
+     * Gets the ReviewList for a BoardGame object
      *
-     * @return The genre of the BoardGame
+     * @return ReviewList representing all reviews of a board game
      */
-    public String getGenre(){return genre;}
+    public ReviewList getReviews(){return reviews;}
 
+    /**
+     * Gets the RatingList for a BoardGame object
+     *
+     * @return RatingList representing all ratings of a board game
+     */
+    public RatingList getRatings(){return ratings;}
+
+    //Adders
+
+    /**
+     * Adds a genre to the genres
+     *
+     * @param aGenre The genre that is being added to the genre arrayList object
+     */
+    public void addGenre(String aGenre) {genre.add(aGenre);}
+
+    /**
+     * Adds a rating to a BoardGames ratinglist
+     *
+     * @param rating The rating that is being added to the ratingList object
+     */
+    public void addRating(int rating) {ratings.addRating(rating);}
+
+    /**
+     * Adds a review to the BoardGames reviewList
+     *
+     * @param review The review that is being added to the reviewList object
+     */
+    public void addReview(String review){reviews.addReview(review);}
+
+    //Setters//
     /**
      * Sets the title for a BoardGame object
      *
@@ -75,19 +133,45 @@ public class BoardGame {
      */
     public void setTitle(String title){this.title = title;}
 
-    public String getTitle(){return title;}
+    /**
+     * Sets the description for a BoardGame object
+     *
+     * @param description The description of the Board Game
+     */
+    public void setDescription(String description){this.description = description;}
 
     /**
-     * Gets the ratings of a BoardGame object
+     * Sets the image link for a BoardGame object
      *
-     * @return The ratings of the BoardGame
+     * @param image The description of the Board Game
      */
-    public RatingList getRatings(){return ratings;}
+    public void setImage(String image){this.image = image;}
 
     /**
-     * Gets the reviews of a BoardGame object
+     * Sets the publisher of a BoardGame object
      *
-     * @return The reviews of the BoardGame
+     * @param publisher The publisher of a Board Game
      */
-    public ReviewList getReviews(){return reviews;}
+    public void setPublisher(String publisher){this.publisher = publisher;}
+
+    //Returns//
+    /**
+     *  Calculates the average rating for a BoardGame object
+     *
+     * @return The average rating for a BoardGame
+     */
+    public float getAvgRating() {return ratings.getAverage();}
+
+    //Comparators
+    /**
+     *  Compares a board game to another by its title
+     */
+    public static Comparator<BoardGame> byTitle =
+            Comparator.comparing(BoardGame::getTitle);
+
+    /**
+     *  Compares a board game to another by its rating average
+     */
+    public static Comparator<BoardGame> byRating =
+            Comparator.comparing(BoardGame::getAvgRating);
 }

@@ -12,7 +12,7 @@ import java.util.List;
  * @author Levi Snellgrove
  * @author Nathaniel Chan
  */
-public class DashboardView extends JFrame {
+public class DashboardView extends JPanel {
     private final String username;
     private final MyGameLibraryApp app;
 
@@ -33,7 +33,7 @@ public class DashboardView extends JFrame {
     }
 
     public void initializeUI() {
-        // Modern color scheme
+        // Color Scheme
         Color backgroundColor = new Color(250, 250, 252);
         Color accentColor = new Color(0, 122, 204);
         Color textColor = new Color(33, 37, 41);
@@ -41,13 +41,8 @@ public class DashboardView extends JFrame {
         Color buttonHoverColor = new Color(90, 98, 104);
         Color logoutButtonColor = new Color(220, 53, 69);
         Color logoutButtonHoverColor = new Color(200, 35, 51);
-
-        setTitle("My Game Library - Dashboard");
         setLayout(new BorderLayout());
-        // Set to full screen
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setUndecorated(false); // Keep window decorations for closing/minimizing
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBackground(backgroundColor);
 
         // Top panel - Header with navigation
         JPanel top = new JPanel(new BorderLayout());
@@ -55,13 +50,13 @@ public class DashboardView extends JFrame {
         top.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel titleLabel = new JLabel("Dashboard - " + username);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24)); // Increased font size
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setForeground(textColor);
         titleLabel.setPreferredSize(new Dimension(300, 50));
         top.add(titleLabel, BorderLayout.WEST);
 
         // Navigation buttons panel
-        JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 0)); // Increased spacing between buttons
+        JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 0));
         navPanel.setBackground(backgroundColor);
 
         collections = createStyledButton("My Collections", buttonColor, Color.WHITE, buttonHoverColor);
@@ -87,20 +82,23 @@ public class DashboardView extends JFrame {
         searchBar = new JTextField();
         searchBar.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(accentColor, 2),
-                BorderFactory.createEmptyBorder(12, 20, 12, 20) // Increased padding
+                BorderFactory.createEmptyBorder(12, 20, 12, 20)
         ));
         searchBar.setHorizontalAlignment(SwingConstants.CENTER);
-        searchBar.setFont(new Font("Arial", Font.PLAIN, 18)); // Increased font size
-        searchBar.setPreferredSize(new Dimension(500, 50)); // Made search bar bigger
+            /** Search text for readability. */
+            searchBar.setFont(new Font("Arial", Font.PLAIN, 18));
+            /** Search bar for easier input. */
+            searchBar.setPreferredSize(new Dimension(500, 50));
         searchBar.setMaximumSize(new Dimension(500, 50));
         searchBar.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Set up placeholder text behavior
+        /** Initialize placeholder text behavior. */
         setupSearchBarPlaceholder();
 
         JLabel genreSearchLabel = new JLabel("Browse by game type");
         genreSearchLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        genreSearchLabel.setFont(new Font("Arial", Font.BOLD, 18)); // Increased font size
+        /** Genre label font for readability. */
+        genreSearchLabel.setFont(new Font("Arial", Font.BOLD, 18));
         genreSearchLabel.setForeground(textColor);
         genreSearchLabel.setBorder(BorderFactory.createEmptyBorder(30, 0, 10, 0));
         genreSearchLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -195,9 +193,6 @@ public class DashboardView extends JFrame {
         // Add panels to main frame
         add(top, BorderLayout.NORTH);
         add(middle, BorderLayout.CENTER);
-
-        // Set overall background
-        getContentPane().setBackground(backgroundColor);
     }
 
     private RoundedCornerButton createStyledButton(String text, Color bgColor, Color fgColor, Color hoverColor) {
@@ -208,7 +203,7 @@ public class DashboardView extends JFrame {
         RoundedCornerButton button = new RoundedCornerButton(text);
         button.setBackground(bgColor);
         button.setForeground(fgColor);
-        button.setFont(new Font("Arial", Font.BOLD, 16)); // Increased font size
+        button.setFont(new Font("Arial", Font.BOLD, 16));
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setPreferredSize(new Dimension(width, height));

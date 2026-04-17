@@ -1,8 +1,16 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import javax.imageio.ImageIO;
 
 /**
  * CollectionsView displays the user's game collections with a table showing game details.
@@ -10,16 +18,20 @@ import java.util.List;
  *
  * @author Nathaniel Chan
  */
-public class CollectionsView extends JFrame {
+public class CollectionsView extends JPanel {
     private final String username;
     private final MyGameLibraryApp app;
+    private final AccountDatabase accountDatabase;
     private ArrayList<GameCollection> userCollections;
     private GameCollection currentCollection;
     private List<BoardGame> allGames;
+    private List<BoardGame> displayedGames;
 
     private RoundedCornerButton collections;
     private RoundedCornerButton dashboard;
     private RoundedCornerButton logout;
+
+    private static final Map<String, ImageIcon> imageCache = new HashMap<>();
 
     private JPanel collectionsListPanel;
     private JTable gamesTable;
@@ -32,14 +44,15 @@ public class CollectionsView extends JFrame {
     public CollectionsView(String username, MyGameLibraryApp app) {
         this.username = username;
         this.app = app;
+        this.accountDatabase = new AccountDatabase();
         this.userCollections = new ArrayList<>();
         initializeCollections();
         initializeUI();
         initializeBehavior();
     }
 
+    /** Load the global game list and then load saved user collections from disk. */
     private void initializeCollections() {
-        // Load all games from XML
         allGames = GameParser.parseAllGames("assets/bgg90Games.xml");
 
         GameCollection allGamesCollection = new GameCollection("All Games");
@@ -48,11 +61,42 @@ public class CollectionsView extends JFrame {
         }
         userCollections.add(allGamesCollection);
 
-        GameCollection favorites = new GameCollection("Favorites");
-        userCollections.add(favorites);
+        List<String> collectionNames = accountDatabase.getCollectionNames(username);
+        if (!collectionNames.contains("Favorites")) {
+            accountDatabase.createCollection(username, "Favorites");
+            collectionNames = accountDatabase.getCollectionNames(username);
+        }
+
+        for (String collectionName : collectionNames) {
+            if (collectionName.equals("All Games")) {
+                continue;
+            }
+
+            GameCollection savedCollection = new GameCollection(collectionName);
+            for (String gameId : accountDatabase.getCollectionGameIds(username, collectionName)) {
+                BoardGame matchingGame = findGameByTitle(gameId);
+                if (matchingGame != null) {
+                    savedCollection.addGame(matchingGame);
+                }
+            }
+            userCollections.add(savedCollection);
+        }
 
         currentCollection = allGamesCollection;
     }
+
+    private BoardGame findGameByTitle(String title) {
+        if (title == null || title.isBlank()) {
+            return null;
+        }
+        for (BoardGame game : allGames) {
+            if (title.equalsIgnoreCase(game.getTitle())) {
+                return game;
+            }
+        }
+        return null;
+    }
+
 
     public void initializeUI() {
         Color backgroundColor = new Color(250, 250, 252);
@@ -63,24 +107,22 @@ public class CollectionsView extends JFrame {
         Color logoutButtonColor = new Color(220, 53, 69);
         Color logoutButtonHoverColor = new Color(200, 35, 51);
 
-        setTitle("My Game Library - My Collections");
         setLayout(new BorderLayout());
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBackground(backgroundColor);
 
-        // Top panel - Header with navigation
+        /** Top panel header with navigation. */
         JPanel top = new JPanel(new BorderLayout());
         top.setBackground(backgroundColor);
         top.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Left side - Title
+        /** Left side title. */
         JLabel titleLabel = new JLabel("My Collections - " + username);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setForeground(textColor);
         titleLabel.setPreferredSize(new Dimension(300, 50));
         top.add(titleLabel, BorderLayout.WEST);
 
-        // Center - Search bar
+        /** Center search bar. */
         searchBar = new JTextField();
         searchBar.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(accentColor, 2),
@@ -97,7 +139,7 @@ public class CollectionsView extends JFrame {
         centerPanel.add(searchBar);
         top.add(centerPanel, BorderLayout.CENTER);
 
-        // Right side - Navigation buttons
+        /** Right side navigation buttons. */
         JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 0));
         navPanel.setBackground(backgroundColor);
         navPanel.setPreferredSize(new Dimension(600, 50));
@@ -112,11 +154,11 @@ public class CollectionsView extends JFrame {
 
         top.add(navPanel, BorderLayout.EAST);
 
-        // Main content panel
+        /** Main content panel. */
         JPanel mainContent = new JPanel(new BorderLayout());
         mainContent.setBackground(backgroundColor);
 
-        // Left side - Collections list
+        /** Left side collections list. */
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.setBackground(backgroundColor);
         leftPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 10));
@@ -135,7 +177,7 @@ public class CollectionsView extends JFrame {
         collectionsScroll.getViewport().setBackground(backgroundColor);
         leftPanel.add(collectionsScroll, BorderLayout.CENTER);
 
-        // Bottom left - Create/Remove collection buttons
+        /** Bottom-left create/remove collection buttons. */
         JPanel leftButtonPanel = new JPanel();
         leftButtonPanel.setLayout(new BoxLayout(leftButtonPanel, BoxLayout.Y_AXIS));
         leftButtonPanel.setBackground(backgroundColor);
@@ -150,7 +192,7 @@ public class CollectionsView extends JFrame {
 
         leftPanel.add(leftButtonPanel, BorderLayout.SOUTH);
 
-        // Right side - Games table
+        /** Right side games table. */
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.setBackground(backgroundColor);
         rightPanel.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 20));
@@ -160,12 +202,13 @@ public class CollectionsView extends JFrame {
         collectionNameLabel.setForeground(textColor);
         rightPanel.add(collectionNameLabel, BorderLayout.NORTH);
 
-        // Games table
+        /** Games table configuration. */
         String[] columnNames = {"Cover", "Name", "Publisher", "Average Rating", "Rate it!", "Leave/View a Review"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 4 || column == 5; // Allow editing ratings and reviews
+                /** Allow editing reviews in the review column. */
+                return column == 5;
             }
         };
 
@@ -174,6 +217,60 @@ public class CollectionsView extends JFrame {
         gamesTable.setRowHeight(80);
         gamesTable.setBackground(Color.WHITE);
         gamesTable.setGridColor(accentColor);
+        gamesTable.getColumnModel().getColumn(0).setPreferredWidth(110);
+        gamesTable.getColumnModel().getColumn(0).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = new JLabel();
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                label.setOpaque(true);
+                if (isSelected) {
+                    label.setBackground(table.getSelectionBackground());
+                } else {
+                    label.setBackground(Color.WHITE);
+                }
+                String url = value instanceof String ? (String) value : null;
+                if (url != null && !url.isBlank()) {
+                    if (imageCache.containsKey(url)) {
+                        label.setIcon(imageCache.get(url));
+                    } else {
+                        new SwingWorker<ImageIcon, Void>() {
+                            @Override
+                            protected ImageIcon doInBackground() throws Exception {
+                                BufferedImage img = ImageIO.read(new URL(url));
+                                if (img == null) return null;
+                                Image scaled = img.getScaledInstance(100, 70, Image.SCALE_SMOOTH);
+                                return new ImageIcon(scaled);
+                            }
+                            @Override
+                            protected void done() {
+                                try {
+                                    ImageIcon icon = get();
+                                    if (icon != null) {
+                                        imageCache.put(url, icon);
+                                        table.repaint();
+                                    }
+                                } catch (Exception ignored) {}
+                            }
+                        }.execute();
+                    }
+                }
+                return label;
+            }
+        });
+
+        gamesTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2 && gamesTable.getSelectedRow() != -1) {
+                    int row = gamesTable.convertRowIndexToModel(gamesTable.getSelectedRow());
+                    if (displayedGames != null && row >= 0 && row < displayedGames.size()) {
+                        openGameScreen(displayedGames.get(row));
+                    }
+                }
+            }
+        });
 
         JScrollPane tableScroll = new JScrollPane(gamesTable);
         tableScroll.setBorder(BorderFactory.createLineBorder(accentColor, 2));
@@ -187,8 +284,6 @@ public class CollectionsView extends JFrame {
 
         populateCollectionsList();
         updateGamesTable();
-
-        getContentPane().setBackground(backgroundColor);
     }
 
     private void populateCollectionsList() {
@@ -223,24 +318,38 @@ public class CollectionsView extends JFrame {
         collectionsListPanel.repaint();
     }
 
+    /** Bind the currently selected collection to the table view. */
     private void updateGamesTable() {
         tableModel.setRowCount(0);
 
-        if (currentCollection == null || currentCollection.getTitle().equals("All Games")) {
-            // Load games from XML for "All Games" collection
-            loadGamesFromXML();
+        if (currentCollection == null) {
+            displayedGames = new ArrayList<>();
+        } else if (currentCollection.getTitle().equals("All Games")) {
+            displayedGames = allGames;
+        } else {
+            displayedGames = currentCollection.getGames();
         }
-    }
 
-    private void loadGamesFromXML() {
-        if (allGames == null || allGames.isEmpty()) {
-            tableModel.addRow(new Object[]{"[Cover]", "No games available", "", "N/A", "", ""});
+        if (displayedGames == null || displayedGames.isEmpty()) {
+            tableModel.addRow(new Object[]{"", "No games available", "", "N/A", "", ""});
             return;
         }
 
-        for (BoardGame game : allGames) {
-            tableModel.addRow(new Object[]{"[Cover]", game.getTitle(), game.getPublisher(), game.getRatings(), "[Rate]", "[Review]"});
+        for (BoardGame game : displayedGames) {
+            String avgRating = String.format("%.1f", game.getAvgRating());
+
+            int userRating = accountDatabase.getUserRating(username, game.getTitle());
+            String rateDisplay = userRating > 0 ? userRating + "/5" : "—";
+
+            String userReview = accountDatabase.getUserReview(username, game.getTitle());
+            String reviewDisplay = (userReview != null && !userReview.trim().isEmpty()) ? userReview : "—";
+
+            tableModel.addRow(new Object[]{game.getImage(), game.getTitle(), game.getPublisher(), avgRating, rateDisplay, reviewDisplay});
         }
+    }
+
+    private void openGameScreen(BoardGame game) {
+        app.showGameScreenView(game, username);
     }
 
     private RoundedCornerButton createStyledButton(String text, Color bgColor, Color fgColor, Color hoverColor) {
@@ -252,7 +361,7 @@ public class CollectionsView extends JFrame {
         final Color placeholderColor = new Color(150, 150, 150);
         final Color textColor = Color.BLACK;
 
-        // Set initial placeholder state
+        /** Set initial placeholder state. */
         searchBar.setText(placeholderText);
         searchBar.setForeground(placeholderColor);
 
@@ -304,12 +413,11 @@ public class CollectionsView extends JFrame {
 
     public void initializeBehavior() {
         collections.addActionListener(e -> {
-            // Stay on collections view
+            /** Stay on collections view. */
         });
 
         dashboard.addActionListener(e -> {
             app.showDashboardView(username);
-            dispose();
         });
 
         logout.addActionListener(e -> {
@@ -334,10 +442,12 @@ public class CollectionsView extends JFrame {
         });
     }
 
+    /** Prompt the user to create a new custom collection and persist it to disk. */
     private void createCollection() {
         String name = JOptionPane.showInputDialog(this, "Enter a name for the new collection:", "Create Collection", JOptionPane.PLAIN_MESSAGE);
         if (name == null) {
-            return; // Cancelled
+            /** Cancelled by user. */
+            return;
         }
 
         name = name.trim();
@@ -355,12 +465,14 @@ public class CollectionsView extends JFrame {
 
         GameCollection newCollection = new GameCollection(name);
         userCollections.add(newCollection);
+        accountDatabase.createCollection(username, name);
         currentCollection = newCollection;
         collectionNameLabel.setText(newCollection.getTitle());
         populateCollectionsList();
         updateGamesTable();
     }
 
+    /** Remove the currently selected custom collection from the UI and saved account data. */
     private void removeCollection() {
         if (currentCollection == null) {
             return;
@@ -378,6 +490,7 @@ public class CollectionsView extends JFrame {
                 JOptionPane.YES_NO_OPTION);
 
         if (result == JOptionPane.YES_OPTION) {
+            accountDatabase.removeCollection(username, title);
             userCollections.remove(currentCollection);
             currentCollection = userCollections.get(0);
             collectionNameLabel.setText(currentCollection.getTitle());
@@ -386,8 +499,9 @@ public class CollectionsView extends JFrame {
         }
     }
 
+    /** Search function placeholder for collection text filtering. */
     private void searchCollections(String query) {
-        // TODO: implement search logic for collections
+        /** TODO: implement search logic for collections. */
         System.out.println("Searching for: " + query);
     }
 }

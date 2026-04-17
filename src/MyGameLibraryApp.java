@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * MyGameLibraryApp class is the main entry point for My Game Library application.
@@ -13,8 +14,7 @@ import javax.swing.*;
 public class MyGameLibraryApp implements LoginPopup.LoginListener {
 
     private LoginPopup loginPopup;
-    private DashboardView dashboardView;
-    private CollectionsView collectionsView;
+    private JFrame currentFrame;
     private String currentUser;
 
     /**
@@ -35,33 +35,49 @@ public class MyGameLibraryApp implements LoginPopup.LoginListener {
         loginPopup.setVisible(true);
     }
 
+    private JFrame createFrame() {
+        JFrame frame = new JFrame("My Game Library");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        return frame;
+    }
+
+    private void switchTo(JPanel view) {
+        JFrame newFrame = createFrame();
+        newFrame.add(view);
+        newFrame.setVisible(true);
+        if (currentFrame != null) {
+            currentFrame.dispose();
+        }
+        currentFrame = newFrame;
+    }
+
     /**
      * Shows the dashboard view after successful login.
-     * This window is hidden until user successfully authenticates.
      *
      * @param username the username of the logged-in user
      */
     public void showDashboardView(String username) {
-        if (collectionsView != null) {
-            collectionsView.dispose();
-            collectionsView = null;
-        }
-        dashboardView = new DashboardView(username, this);
-        dashboardView.setVisible(true);
+        switchTo(new DashboardView(username, this));
     }
-    
+
     /**
      * Shows the collections view.
      *
      * @param username the username of the logged-in user
      */
     public void showCollectionsView(String username) {
-        if (dashboardView != null) {
-            dashboardView.dispose();
-            dashboardView = null;
-        }
-        collectionsView = new CollectionsView(username, this);
-        collectionsView.setVisible(true);
+        switchTo(new CollectionsView(username, this));
+    }
+
+    /**
+     * Shows the game screen view.
+     *
+     * @param game the game to display
+     * @param username the username of the logged-in user
+     */
+    public void showGameScreenView(BoardGame game, String username) {
+        switchTo(new GameScreenView(game, username, this));
     }
 
     /**
@@ -87,17 +103,13 @@ public class MyGameLibraryApp implements LoginPopup.LoginListener {
 
     /**
      * Called when the user logs out from the main window.
-     * Closes the main window and shows the login window again.
+     * Closes the current window and shows the login window again.
      */
     public void onLogout() {
         currentUser = null;
-        if (dashboardView != null) {
-            dashboardView.dispose();
-            dashboardView = null;
-        }
-        if (collectionsView != null) {
-            collectionsView.dispose();
-            collectionsView = null;
+        if (currentFrame != null) {
+            currentFrame.dispose();
+            currentFrame = null;
         }
         showLoginWindow();
     }

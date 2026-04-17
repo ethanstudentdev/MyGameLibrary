@@ -14,18 +14,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A class that implements parsing an XML database file
+ *
+ * @author Ethan Johnson
+ */
 public class GameParser {
-    public static void main(){
-        //XML file name
-        String filePath = "C:\\Users\\Natha\\IdeaProjects\\MyGameLibrary\\assets\\bgg90Games.xml";
+    /**
+     * this method parses a complete XML file and populates a GameCollection object with all of the BoardGame
+     * entries contained within the XML file
+     *
+     * @param gameFile The XML file to be parsed in the form of a Java File type
+     * @return A game collection representing all games to be used for searching, sorting, and all other functionality
+     *         of the application
+     */
+    public static void main(String[] args){
+        String filePath = "assets/bgg90Games.xml";
+        GameParser parser = new GameParser();
+        GameCollection master = parser.parse(new File(filePath));
+        master.printAllNames();
+    }
 
-        //Master GameCollection object stores all games from path XML
-        GameCollection master = new GameCollection("allGames") ;
-
+    public GameCollection parse(File gameFile)
+    {
+        GameCollection collection = new GameCollection("allGames");
         try{
-            //Setting up infile
-            File gameFile = new File(filePath);
-
             //Building the doc to parse
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = factory.newDocumentBuilder();
@@ -43,40 +56,89 @@ public class GameParser {
                 //Board Game for current item
                 BoardGame game = new BoardGame();
 
-                //Logic for name node
-                NodeList nameList = document.getElementsByTagName("name");
-                Node nameNode = nameList.item(i);
-                if (nameNode.getNodeType() == Node.ELEMENT_NODE)
-                {
-                    Element items = (Element) nameNode;
-                    NamedNodeMap attributes = items.getAttributes();
-                    System.out.println("Current Node: " + (i + 1));
-                    for (int k = 0; k < attributes.getLength(); k++)
-                    {
-                        Node attr = attributes.item(k);
+                //Represents item node
+                Node node = list.item(i);
 
-                        System.out.println("Attribute name: " + attr.getNodeName());
-                        System.out.println("Attribute value: " + attr.getNodeValue());
-                        System.out.println();
-                    }
-                    //Only assigns BoardGame name if it is the primary name for the game
-                    if(items.getAttribute("type").equals("primary"))
+                //Represents a generic element of node item
+                Element itemElement = (Element) node;
+
+                //Logic for children name nodes//
+                NodeList nameList = itemElement.getElementsByTagName("name");
+
+                for(int j = 0 ; j < nameList.getLength() ; j++)
+                {
+                    Node nameNode = nameList.item(j);
+                    if(nameNode.getNodeType() == Node.ELEMENT_NODE)
                     {
-                        System.out.println("This was a primary!");
-                        game.setTitle(items.getAttribute("value"));
+                        Element nameElement = (Element) nameNode;
+                        if ("primary".equals(nameElement.getAttribute("type")))
+                        {
+                            game.setTitle(nameElement.getAttribute("value"));
+                        }
                     }
                 }
-                //End name node logic
+                //End children name nodes logic//
 
-                master.addGame(game);
-                System.out.println("---Next Node---");
+                //Logic for children description nodes//
+                NodeList descriptionList = itemElement.getElementsByTagName("description");
+                Node descriptionNode = descriptionList.item(0);
+                if(descriptionNode.getNodeType() == Node.ELEMENT_NODE)
+                {
+                    Element descriptionElement = (Element) descriptionNode;
+                    //Sets a description if there is one
+                    if(!(descriptionElement.getTextContent()).isBlank())
+                    {
+                        game.setDescription(descriptionElement.getTextContent());
+                    }
+                }
+                //End children description nodes logic//
+
+                //Logic for children image nodes//
+                NodeList imageList = itemElement.getElementsByTagName("image");
+                Node imageNode = imageList.item(0);
+                if(imageNode.getNodeType() == Node.ELEMENT_NODE)
+                {
+                    Element imageElement = (Element) imageNode;
+                    //Sets an image if there is one
+                    if(!(imageElement.getTextContent()).isBlank())
+                    {
+                        game.setImage(imageElement.getTextContent());
+                    }
+                }
+                //End children image nodes logic//
+
+                //Logic for children link nodes//
+                NodeList linkList = itemElement.getElementsByTagName("link");
+
+                //Loops through link nodes
+                for(int j = 0 ; j < linkList.getLength() ; j++)
+                {
+                    Node linkNode = linkList.item(j);
+                    //Logic for boardgamecategory nodes
+                    if(linkNode.getNodeType() == Node.ELEMENT_NODE)
+                    {
+                        Element genreElement = (Element) linkNode;
+                        if ("boardgamecategory".equals(genreElement.getAttribute("type")))
+                        {
+                            game.addGenre(genreElement.getAttribute("value"));
+                        }
+                        if ("boardgamepublisher".equals(genreElement.getAttribute("type")))
+                        {
+                            game.setPublisher(genreElement.getAttribute("value"));
+                        }
+                    }
+                }
+                //End children link nodes logic//
+
+                //Adds BoardGame to collection
+                collection.addGame(game);
             }
 
         } catch (ParserConfigurationException | IOException | SAXException e) {
             throw new RuntimeException(e);
         }
-        //Debug method call
-        master.printAllNames();
+        //Returns the collection
+        return collection;
     }
 
     public static List<CategoryCount> getCategoryCountsFromFile(String xmlFilePath) {
@@ -127,75 +189,8 @@ public class GameParser {
     }
 
     public static List<BoardGame> parseAllGames(String xmlFilePath) {
-        List<BoardGame> games = new ArrayList<>();
-
-        try {
-            File gameFile = new File(xmlFilePath);
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = factory.newDocumentBuilder();
-            Document document = docBuilder.parse(gameFile);
-            document.getDocumentElement().normalize();
-
-            NodeList items = document.getElementsByTagName("item");
-            for (int i = 0; i < items.getLength(); i++) {
-                Node itemNode = items.item(i);
-                if (itemNode.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                }
-
-                Element itemElement = (Element) itemNode;
-                String title = "Unknown";
-                String publisher = "Unknown";
-                String description = "";
-                String genre = "Unknown";
-
-                NodeList nameNodes = itemElement.getElementsByTagName("name");
-                for (int j = 0; j < nameNodes.getLength(); j++) {
-                    Node nameNode = nameNodes.item(j);
-                    if (nameNode.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-                    Element nameElement = (Element) nameNode;
-                    if ("primary".equals(nameElement.getAttribute("type"))) {
-                        String value = nameElement.getAttribute("value");
-                        if (value != null && !value.trim().isEmpty()) {
-                            title = value.trim();
-                        }
-                        break;
-                    }
-                }
-
-                NodeList descriptionNodes = itemElement.getElementsByTagName("description");
-                if (descriptionNodes.getLength() > 0) {
-                    description = descriptionNodes.item(0).getTextContent().trim();
-                }
-
-                NodeList linkNodes = itemElement.getElementsByTagName("link");
-                for (int j = 0; j < linkNodes.getLength(); j++) {
-                    Node linkNode = linkNodes.item(j);
-                    if (linkNode.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-                    Element linkElement = (Element) linkNode;
-                    String type = linkElement.getAttribute("type");
-                    String value = linkElement.getAttribute("value");
-                    if (value == null || value.trim().isEmpty()) {
-                        continue;
-                    }
-                    if ("boardgamepublisher".equals(type)) {
-                        publisher = value.trim();
-                    } else if ("boardgamecategory".equals(type) && "Unknown".equals(genre)) {
-                        genre = value.trim();
-                    }
-                }
-
-                games.add(new BoardGame(title, description, publisher, genre, new RatingList(), new ReviewList()));
-            }
-        } catch (ParserConfigurationException | IOException | SAXException e) {
-            System.err.println("Unable to read games from XML: " + e.getMessage());
-        }
-
-        return games;
+        GameParser parser = new GameParser();
+        return parser.parse(new File(xmlFilePath)).getGames();
     }
 
     public static class CategoryCount {

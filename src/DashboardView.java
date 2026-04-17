@@ -291,7 +291,6 @@ public class DashboardView extends JPanel {
 
     private void openCollections() {
         app.showCollectionsView(username);
-        dispose();
     }
 
     private void openDashboard() {

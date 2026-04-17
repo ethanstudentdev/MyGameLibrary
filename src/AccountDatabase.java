@@ -56,11 +56,6 @@ public class AccountDatabase {
         loadFromFile();
     }
 
-    // Methods
-
-    /**
-     * Creates and stores a new account with an empty personal collection, then saves to XML file.
-     */
     public void setAccountInfo(String username, String password, boolean isAdmin) {
         usernames.add(username);
         passwords.add(password);
@@ -78,8 +73,8 @@ public class AccountDatabase {
      * Checks if a username already exists in the database.
      */
     public boolean userExists(String username) {
-        for (int i = 0; i < usernames.size(); i++) {
-            if (usernames.get(i).equals(username)) {
+        for (String existing : usernames) {
+            if (existing.equals(username)) {
                 return true;
             }
         }
@@ -100,9 +95,6 @@ public class AccountDatabase {
         return false;
     }
 
-    /**
-     * Adds a game ID to a user's personal collection and saves to XML file.
-     */
     public void createCollection(String username, String collectionName) {
         int userIndex = findUserIndex(username);
         if (userIndex == -1 || collectionName == null || collectionName.isBlank()) {
@@ -190,9 +182,14 @@ public class AccountDatabase {
         }
     }
 
-    /**
-     * Removes a game ID from a user's personal collection and saves to XML file.
-     */
+    public List<String> getPersonalCollection(String username) {
+        return getCollectionGameIds(username, "Favorites");
+    }
+
+    public void addGameToCollection(String username, String gameId) {
+        addGameToCollection(username, "Favorites", gameId);
+    }
+
     public void removeGameFromCollection(String username, String gameId) {
         removeGameFromCollection(username, "Favorites", gameId);
     }
@@ -238,9 +235,7 @@ public class AccountDatabase {
         return -1;
     }
 
-    /**
-     * Saves all accounts to the XML file.
-     */
+    // Persist all accounts and their saved collections to XML disk storage.
     private void saveToFile() {
         try {
             //Building the doc to write
@@ -326,9 +321,7 @@ public class AccountDatabase {
         }
     }
 
-    /**
-     * Loads accounts from the XML file if it exists.
-     */
+    // Load accounts and collections from the XML file into memory.
     private void loadFromFile() {
         //Setting up infile
         File accountFile = new File(FILE_PATH);
@@ -347,12 +340,14 @@ public class AccountDatabase {
             NodeList list = document.getElementsByTagName("account");
             for (int i = 0; i < list.getLength(); i++) {
                 Node node = list.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    Element element = (Element) node;
+                if (node.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
 
-                    usernames.add(element.getElementsByTagName("username").item(0).getTextContent());
-                    passwords.add(element.getElementsByTagName("password").item(0).getTextContent());
-                    adminStatus.add(Boolean.parseBoolean(element.getElementsByTagName("isAdmin").item(0).getTextContent()));
+                Element element = (Element) node;
+                usernames.add(element.getElementsByTagName("username").item(0).getTextContent());
+                passwords.add(element.getElementsByTagName("password").item(0).getTextContent());
+                adminStatus.add(Boolean.parseBoolean(element.getElementsByTagName("isAdmin").item(0).getTextContent()));
 
                 ArrayList<SavedCollection> savedCollections = new ArrayList<>();
                 NodeList collectionNodes = element.getElementsByTagName("collection");

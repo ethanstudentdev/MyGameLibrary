@@ -44,7 +44,7 @@ public class CollectionsView extends JPanel {
     public CollectionsView(String username, MyGameLibraryApp app) {
         this.username = username;
         this.app = app;
-        this.accountDatabase = new AccountDatabase();
+        this.accountDatabase = app.getAccountDatabase();
         this.userCollections = new ArrayList<>();
         initializeCollections();
         initializeUI();

@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public class AccountDatabase {
 
-    private static final String FILE_PATH = "assets/accounts.xml";
+    private final String FILE_PATH;
 
     private final ArrayList<String> usernames = new ArrayList<>();
     private final ArrayList<String> passwords = new ArrayList<>();
@@ -52,7 +52,13 @@ public class AccountDatabase {
         }
     }
 
-    public AccountDatabase() {
+    /**
+     * Creates an AccountDatabase that reads/writes to the given XML file path.
+     *
+     * @param filePath path to the accounts XML file (ex: "assets/accounts.xml")
+     */
+    public AccountDatabase(String filePath) {
+        this.FILE_PATH = filePath;
         loadFromFile();
     }
 

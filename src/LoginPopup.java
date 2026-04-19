@@ -49,11 +49,12 @@ public class LoginPopup extends JFrame {
      * Constructor for LoginPopup.
      * Creates and initializes the login window.
      *
-     * @param listener the LoginListener to notify on login events
+     * @param listener        the LoginListener to notify on login events
+     * @param accountDatabase the shared account database loaded from config path
      */
-    public LoginPopup(LoginListener listener) {
+    public LoginPopup(LoginListener listener, AccountDatabase accountDatabase) {
         this.listener = listener;
-        this.user = new User();
+        this.user = new User(accountDatabase);
 
         setTitle("My Game Library - Login");
         initializeUI();

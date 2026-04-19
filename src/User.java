@@ -15,13 +15,15 @@ public class User {
     //Constructors
 
     /**
-     * Constructs a User object with no passed parameters and defines defaults
+     * Constructs a User with a shared AccountDatabase.
+     *
+     * @param accountDatabase the shared account database
      */
-    public User() {
+    public User(AccountDatabase accountDatabase) {
         this.username = "";
         this.password = "";
         this.personalCollections = new ArrayList<>();
-        this.accountDatabase = new AccountDatabase();
+        this.accountDatabase = accountDatabase;
     }
 
     //Methods

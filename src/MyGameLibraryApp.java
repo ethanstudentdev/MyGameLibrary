@@ -16,12 +16,18 @@ public class MyGameLibraryApp implements LoginPopup.LoginListener {
     private LoginPopup loginPopup;
     private JFrame currentFrame;
     private String currentUser;
+    private final Admin admin;
+    private final AccountDatabase accountDatabase;
 
     /**
      * Constructor for MyGameLibraryApp.
-     * Initializes the application and shows the login window.
+     * Loads config.xml first to get file paths, then initializes the application.
      */
     public MyGameLibraryApp() {
+        // Load config.xml as this gives us the correct paths for accounts and games
+        admin = new Admin();
+        // Create the shared AccountDatabase using the path from config
+        accountDatabase = new AccountDatabase(admin.getAccountsFile());
         currentUser = null;
         showLoginWindow();
     }
@@ -31,7 +37,7 @@ public class MyGameLibraryApp implements LoginPopup.LoginListener {
      * This is the first window the user sees when running the application.
      */
     private void showLoginWindow() {
-        loginPopup = new LoginPopup(this);
+        loginPopup = new LoginPopup(this, accountDatabase);
         loginPopup.setVisible(true);
     }
 
@@ -121,6 +127,20 @@ public class MyGameLibraryApp implements LoginPopup.LoginListener {
      */
     public String getCurrentUser() {
         return currentUser;
+    }
+
+    /**
+     * Gets the Admin instance (holds config paths, can be updated by admin users).
+     */
+    public Admin getAdmin() {
+        return admin;
+    }
+
+    /**
+     * Gets the shared AccountDatabase loaded from the config path.
+     */
+    public AccountDatabase getAccountDatabase() {
+        return accountDatabase;
     }
 
     /**

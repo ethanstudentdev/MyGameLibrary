@@ -19,7 +19,7 @@ public class GameScreenView extends JPanel {
     private final BoardGame game;
     private final String username;
     private final MyGameLibraryApp app;
-    private final AccountDatabase accountDatabase = new AccountDatabase();
+    private final AccountDatabase accountDatabase;
 
     private JLabel avgRatingLabel;
     private JTextArea reviewsArea;
@@ -34,6 +34,7 @@ public class GameScreenView extends JPanel {
         this.game = game;
         this.username = username;
         this.app = app;
+        this.accountDatabase = app.getAccountDatabase();
         initializeUI();
     }
 

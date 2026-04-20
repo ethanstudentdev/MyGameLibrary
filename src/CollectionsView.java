@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,10 +23,12 @@ public class CollectionsView extends JPanel {
     private final String username;
     private final MyGameLibraryApp app;
     private final AccountDatabase accountDatabase;
+    private final Admin admin;
     private ArrayList<GameCollection> userCollections;
     private GameCollection currentCollection;
-    private List<BoardGame> allGames;
+    private GameCollection allGamesCollection;
     private List<BoardGame> displayedGames;
+    private final GameParser parser;
 
     private RoundedCornerButton collections;
     private RoundedCornerButton dashboard;
@@ -41,11 +44,13 @@ public class CollectionsView extends JPanel {
     private RoundedCornerButton createCollectionBtn;
     private RoundedCornerButton removeCollectionBtn;
 
-    public CollectionsView(String username, MyGameLibraryApp app) {
+    public CollectionsView(String username, MyGameLibraryApp app, Admin admin, GameParser parser) {
         this.username = username;
         this.app = app;
         this.accountDatabase = app.getAccountDatabase();
+        this.parser = parser;
         this.userCollections = new ArrayList<>();
+        this.admin = admin;
         initializeCollections();
         initializeUI();
         initializeBehavior();
@@ -53,12 +58,8 @@ public class CollectionsView extends JPanel {
 
     /** Load the global game list and then load saved user collections from disk. */
     private void initializeCollections() {
-        allGames = GameParser.parseAllGames("assets/bgg90Games.xml");
-
-        GameCollection allGamesCollection = new GameCollection("All Games");
-        for (BoardGame game : allGames) {
-            allGamesCollection.addGame(game);
-        }
+        File allGamesFile = new File("assets",admin.getGamesFile());
+        allGamesCollection = parser.parse(allGamesFile);
         userCollections.add(allGamesCollection);
 
         List<String> collectionNames = accountDatabase.getCollectionNames(username);
@@ -89,7 +90,7 @@ public class CollectionsView extends JPanel {
         if (title == null || title.isBlank()) {
             return null;
         }
-        for (BoardGame game : allGames) {
+        for (BoardGame game : allGamesCollection.getGames()) {
             if (title.equalsIgnoreCase(game.getTitle())) {
                 return game;
             }
@@ -325,7 +326,7 @@ public class CollectionsView extends JPanel {
         if (currentCollection == null) {
             displayedGames = new ArrayList<>();
         } else if (currentCollection.getTitle().equals("All Games")) {
-            displayedGames = allGames;
+            displayedGames = allGamesCollection.getGames();
         } else {
             displayedGames = currentCollection.getGames();
         }
@@ -336,7 +337,11 @@ public class CollectionsView extends JPanel {
         }
 
         for (BoardGame game : displayedGames) {
-            String avgRating = String.format("%.1f", game.getAvgRating());
+            float average = accountDatabase.getAverageRatingForGame(game.getTitle());
+            if (average <= 0) {
+                average = game.getAvgRating();
+            }
+            String avgRating = String.format("%.1f", average);
 
             int userRating = accountDatabase.getUserRating(username, game.getTitle());
             String rateDisplay = userRating > 0 ? userRating + "/5" : "—";

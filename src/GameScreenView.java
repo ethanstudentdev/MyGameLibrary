@@ -387,12 +387,15 @@ public class GameScreenView extends JPanel {
     }
 
     private void refreshRatingDisplay() {
-        float average = game.getAvgRating();
+        float average = accountDatabase.getAverageRatingForGame(game.getTitle());
+        if (average <= 0) {
+            average = game.getAvgRating();
+        }
         starRatingLabel.setText(buildStarText(average));
         avgRatingLabel.setText(String.format("%.1f out of 5", average));
     }
 
-    /** Refresh the UI to show the current review list for the game. */
+    /** Refresh the UI to show the current user rating for the game. */
     private void refreshUserRatingDisplay() {
         int userRating = accountDatabase.getUserRating(username, game.getTitle());
         for (int i = 0; i < 5; i++) {
@@ -412,7 +415,9 @@ public class GameScreenView extends JPanel {
 
     private void setUserRating(int rating) {
         accountDatabase.setUserRating(username, game.getTitle(), rating);
+        game.addRating(rating);
         refreshUserRatingDisplay();
+        refreshRatingDisplay();
         JOptionPane.showMessageDialog(this, "Rating saved!", "Thank you", JOptionPane.INFORMATION_MESSAGE);
     }
 

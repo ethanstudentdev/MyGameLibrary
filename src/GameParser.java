@@ -1,18 +1,14 @@
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * A class that implements parsing an XML database file
@@ -28,13 +24,6 @@ public class GameParser {
      * @return A game collection representing all games to be used for searching, sorting, and all other functionality
      *         of the application
      */
-    public static void main(String[] args){
-        String filePath = "assets/bgg90Games.xml";
-        GameParser parser = new GameParser();
-        GameCollection master = parser.parse(new File(filePath));
-        master.printAllNames();
-    }
-
     public GameCollection parse(File gameFile)
     {
         GameCollection collection = new GameCollection("allGames");
@@ -46,14 +35,13 @@ public class GameParser {
             document.getDocumentElement().normalize();
 
             //Fetch top node
-            System.out.print("Root node: ");
             System.out.println(document.getDocumentElement().getNodeName());
 
             //Loop through all item elements
             NodeList list = document.getElementsByTagName("item");
             for(int i = 0 ; i < list.getLength() ; i++)
             {
-                //Board Game for current item
+                //Board Game for current item node (Represents a board game in XML doc)
                 BoardGame game = new BoardGame();
 
                 //Represents item node
@@ -139,80 +127,5 @@ public class GameParser {
         }
         //Returns the collection
         return collection;
-    }
-
-    public static List<CategoryCount> getCategoryCountsFromFile(String xmlFilePath) {
-        Map<String, Integer> counts = new HashMap<>();
-
-        try {
-            File gameFile = new File(xmlFilePath);
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = factory.newDocumentBuilder();
-            Document document = docBuilder.parse(gameFile);
-            document.getDocumentElement().normalize();
-
-            NodeList items = document.getElementsByTagName("item");
-            for (int i = 0; i < items.getLength(); i++) {
-                Node itemNode = items.item(i);
-                if (itemNode.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                }
-
-                Element itemElement = (Element) itemNode;
-                NodeList linkNodes = itemElement.getElementsByTagName("link");
-                for (int j = 0; j < linkNodes.getLength(); j++) {
-                    Node linkNode = linkNodes.item(j);
-                    if (linkNode.getNodeType() != Node.ELEMENT_NODE) {
-                        continue;
-                    }
-
-                    Element linkElement = (Element) linkNode;
-                    if ("boardgamecategory".equals(linkElement.getAttribute("type"))) {
-                        String value = linkElement.getAttribute("value");
-                        if (value != null && !value.trim().isEmpty()) {
-                            value = value.trim();
-                            counts.put(value, counts.getOrDefault(value, 0) + 1);
-                        }
-                    }
-                }
-            }
-        } catch (ParserConfigurationException | IOException | SAXException e) {
-            System.err.println("Unable to read categories from XML: " + e.getMessage());
-        }
-
-        List<CategoryCount> categoryCounts = new ArrayList<>();
-        for (Map.Entry<String, Integer> entry : counts.entrySet()) {
-            categoryCounts.add(new CategoryCount(entry.getKey(), entry.getValue()));
-        }
-        categoryCounts.sort((a, b) -> Integer.compare(b.getCount(), a.getCount()));
-        return categoryCounts;
-    }
-
-    public static List<BoardGame> parseAllGames(String xmlFilePath) {
-        GameParser parser = new GameParser();
-        return parser.parse(new File(xmlFilePath)).getGames();
-    }
-
-    public static class CategoryCount {
-        private final String name;
-        private final int count;
-
-        public CategoryCount(String name, int count) {
-            this.name = name;
-            this.count = count;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getCount() {
-            return count;
-        }
-
-        @Override
-        public String toString() {
-            return name + " (" + count + ")";
-        }
     }
 }

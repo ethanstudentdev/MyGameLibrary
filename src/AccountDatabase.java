@@ -213,6 +213,27 @@ public class AccountDatabase {
         saveToFile();
     }
 
+    public float getAverageRatingForGame(String gameId) {
+        if (gameId == null || gameId.isBlank()) {
+            return 0;
+        }
+
+        int sum = 0;
+        int count = 0;
+        for (Map<String, Integer> ratingsByGame : userRatings.values()) {
+            Integer value = ratingsByGame.get(gameId);
+            if (value != null) {
+                sum += value;
+                count++;
+            }
+        }
+
+        if (count == 0) {
+            return 0;
+        }
+        return (float) sum / count;
+    }
+
     public String getUserReview(String username, String gameId) {
         Map<String, String> reviews = userReviews.get(username);
         if (reviews != null) {

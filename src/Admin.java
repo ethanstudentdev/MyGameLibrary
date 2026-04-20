@@ -13,7 +13,7 @@ import java.io.File;
  */
 public class Admin {
 
-    private static final String CONFIG_PATH = "assets/config.xml";
+    static final String CONFIG_PATH = "assets/config.xml";
 
     private String accountsFile;
     private String gamesFile;
@@ -24,7 +24,7 @@ public class Admin {
     public Admin() {
         // Default values in case the file is missing
         accountsFile = "assets/accounts.xml";
-        gamesFile = "assets/bgg90Games.xml";
+        gamesFile = "bgg90Games.xml";
         loadConfig();
     }
 

@@ -1,7 +1,9 @@
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -11,10 +13,19 @@ import java.util.List;
  *
  * @author Levi Snellgrove
  * @author Nathaniel Chan
+ * @author Ethan Johnson
  */
 public class DashboardView extends JPanel {
     private final String username;
     private final MyGameLibraryApp app;
+    private GameCollection masterCollection;
+    private GameParser parser;
+    private File allGamesFile;
+    private ArrayList<String> categoryNames;
+    private Search searchEngine;
+
+    private boolean searchByTitle;
+    private boolean searchByGenre;
 
     private RoundedCornerButton collections;
     private RoundedCornerButton dashboard;
@@ -25,9 +36,15 @@ public class DashboardView extends JPanel {
     private RoundedCornerButton leftArrow;
     private RoundedCornerButton rightArrow;
 
-    public DashboardView(String username, MyGameLibraryApp app) {
+    public DashboardView(String username, MyGameLibraryApp app, Admin admin) {
         this.username = username;
         this.app = app;
+        this.allGamesFile = new File("assets","bgg90Games.xml");
+        this.parser = new GameParser();
+        this.masterCollection = parser.parse(allGamesFile);
+        this.categoryNames = masterCollection.getGenres();
+        this.searchByTitle = true;
+        this.searchByGenre = false;
         initializeUI();
         initializeBehavior();
     }
@@ -112,45 +129,39 @@ public class DashboardView extends JPanel {
         gridPanel.setLayout(new BoxLayout(gridPanel, BoxLayout.X_AXIS));
         gridPanel.setBackground(backgroundColor);
 
-        String categoryXmlPath = "assets/bgg90Games.xml";
-        List<GameParser.CategoryCount> categoryCounts = GameParser.getCategoryCountsFromFile(categoryXmlPath);
-
-        //Default Example Buttons if the xml isn't found
-        if (categoryCounts.isEmpty()) {
-            categoryCounts = List.of(
-                    new GameParser.CategoryCount("Co-op", 0),
-                    new GameParser.CategoryCount("Competitive", 0),
-                    new GameParser.CategoryCount("Strategy", 0),
-                    new GameParser.CategoryCount("Fantasy", 0)
-            );
-        }
-
+        Collections.sort(categoryNames);
         int maxLabelLength = 0;
-        for (GameParser.CategoryCount categoryCount : categoryCounts) {
-            maxLabelLength = Math.max(maxLabelLength, categoryCount.toString().length());
+
+        for (String genre : categoryNames)
+        {
+            maxLabelLength = Math.max(maxLabelLength, genre.length());
         }
         int buttonWidth = Math.max(180, maxLabelLength * 11 + 40);
         int columnWidth = buttonWidth + 20;
 
         categoryButtons = new ArrayList<>();
-        for (int i = 0; i < categoryCounts.size(); i += 3) {
+        for (int i = 0; i < categoryNames.size(); i += 3)
+        {
             JPanel column = new JPanel(new GridLayout(3, 1, 0, 20));
             column.setBackground(backgroundColor);
             for (int row = 0; row < 3; row++) {
                 int index = i + row;
-                if (index < categoryCounts.size()) {
-                    GameParser.CategoryCount categoryCount = categoryCounts.get(index);
-                    String label = categoryCount.toString();
-                    RoundedCornerButton categoryButton = createStyledButton(label, accentColor, Color.WHITE, new Color(0, 140, 230), buttonWidth, 55);
-                    categoryButton.putClientProperty("categoryName", categoryCount.getName());
+                if (index < categoryNames.size())
+                {
+                    String categoryName = categoryNames.get(index);
+                    RoundedCornerButton categoryButton = createStyledButton(categoryName, accentColor, Color.WHITE, new Color(0, 140, 230), buttonWidth, 55);
+                    categoryButton.putClientProperty("categoryName", categoryName);
+                    categoryButton.addActionListener(e -> searchGames(categoryName));
                     categoryButtons.add(categoryButton);
                     column.add(categoryButton);
-                } else {
+                } else
+                {
                     column.add(Box.createVerticalGlue());
                 }
             }
             gridPanel.add(column);
-            if (i + 3 < categoryCounts.size()) {
+            if (i + 3 < categoryNames.size())
+            {
                 gridPanel.add(Box.createHorizontalStrut(20));
             }
         }
@@ -312,8 +323,22 @@ public class DashboardView extends JPanel {
         if (query == null || query.trim().isEmpty() || query.equals("Search games...")) {
             return; // Don't search if it's placeholder text or empty
         }
-        // TODO: implement search logic for the dashboard search bar
+        //search logic for the dashboard search bar
+        //Creates a new Search class object for searching
+        searchEngine = new Search(query,masterCollection);
+
+        //Creates a collection to store games in and "searches"
+        GameCollection searchCol = new GameCollection();
+
+        searchCol = searchEngine.searchByTitle();
+
+        //debug section
         System.out.println("Searching for: " + query);
+
+        searchCol.printAllGames();
+
+        searchCol.getGenres();
+        searchCol.printGenres();
     }
 
     private void filterByGameType(String type) {

@@ -3,14 +3,17 @@ import java.util.List;
 
 /**
  * A class that represents a single collection of BoardGame objects
+ *
+ * @author Ethan Johnson
  */
 public class GameCollection {
-    // Fields
+    //Fields
 
     private String title;
-    private final ArrayList<BoardGame> games;
+    final private ArrayList<BoardGame> games;
+    final private ArrayList<String> genres;
 
-    // Constructors
+    //Constructors
 
     /**
      * Constructs a GameCollection object that can
@@ -20,19 +23,21 @@ public class GameCollection {
     public GameCollection(String title)
     {
         this.title = title;
-        this.games = new ArrayList<>();
+        this.genres = new ArrayList<String>();
+        this.games = new ArrayList<BoardGame>();
     }
 
     /**
-     * Constructs a GameCollection object with no passed parameters and defines defaults
+     *  Constructs a GameCollection object with no passed parameters and defines defaults
      */
     public GameCollection()
     {
         this.title = "default";
-        this.games = new ArrayList<>();
+        this.genres = new ArrayList<String>();
+        this.games = new ArrayList<BoardGame>();
     }
 
-    // Methods
+    //Methods
 
     /**
      * Sets the title of the gameCollection object from a single passed parameter
@@ -63,16 +68,63 @@ public class GameCollection {
     public String getTitle() {return title;}
 
     /**
-     * Gets the list of games in this collection.
+     * Adds all the genres that exist within the gamecollection to a list and return that list
      *
-     * @return List of BoardGame objects in the collection
+     * @return
      */
-    public List<BoardGame> getGames() {
-        return games;
+    public ArrayList<String> getGenres()
+    {
+        for (BoardGame game : games)
+        {
+           ArrayList<String> currentGenres = game.getGenre();
+           for(String genre : currentGenres)
+           {
+               if(!(genres.contains(genre)))
+               {
+                   genres.add(genre);
+               }
+           }
+        }
+        return genres;
     }
-    public void printAllNames() {
-        for(BoardGame game : games) {
+
+    /**
+     * Debug method to print all games in collection and their info to the console
+     */
+    public void printAllGames()
+    {
+        int i = 0;
+        for(BoardGame game : games)
+        {
+            i++;
+            System.out.println("Game # : " + i);
+            System.out.println("Title");
             System.out.println(game.getTitle());
+            System.out.println("Image Link");
+            System.out.println(game.getImage());
+            System.out.println("Description");
+            System.out.println(game.getDescription());
+            System.out.println("Genres");
+            for(String genre : game.getGenre())
+            {
+                System.out.println(genre);
+            }
+            System.out.println("Publisher");
+            System.out.println(game.getPublisher());
+            System.out.println("Average Rating");
+            System.out.println(game.getAvgRating());
+            System.out.println();
         }
     }
+
+    public void printGenres()
+    {
+        System.out.println("Genres in collection : " + title);
+        for(String g : genres)
+        {
+            System.out.println(g);
+        }
+    }
+
+    public List<BoardGame> getGames() {return games;}
 }

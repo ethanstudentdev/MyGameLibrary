@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * MyGameLibraryApp class is the main entry point for My Game Library application.
@@ -16,6 +15,7 @@ public class MyGameLibraryApp implements LoginPopup.LoginListener {
     private LoginPopup loginPopup;
     private JFrame currentFrame;
     private String currentUser;
+    private GameParser parser;
     private final Admin admin;
     private final AccountDatabase accountDatabase;
 
@@ -26,6 +26,8 @@ public class MyGameLibraryApp implements LoginPopup.LoginListener {
     public MyGameLibraryApp() {
         // Load config.xml as this gives us the correct paths for accounts and games
         admin = new Admin();
+        //Creates the parser to parse games
+        parser = new GameParser();
         // Create the shared AccountDatabase using the path from config
         accountDatabase = new AccountDatabase(admin.getAccountsFile());
         currentUser = null;
@@ -64,7 +66,7 @@ public class MyGameLibraryApp implements LoginPopup.LoginListener {
      * @param username the username of the logged-in user
      */
     public void showDashboardView(String username) {
-        switchTo(new DashboardView(username, this));
+        switchTo(new DashboardView(username, this,admin));
     }
 
     /**
@@ -73,7 +75,7 @@ public class MyGameLibraryApp implements LoginPopup.LoginListener {
      * @param username the username of the logged-in user
      */
     public void showCollectionsView(String username) {
-        switchTo(new CollectionsView(username, this));
+        switchTo(new CollectionsView(username, this, admin,parser));
     }
 
     /**

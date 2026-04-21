@@ -151,7 +151,12 @@ public class DashboardView extends JPanel {
                     String categoryName = categoryNames.get(index);
                     RoundedCornerButton categoryButton = createStyledButton(categoryName, accentColor, Color.WHITE, new Color(0, 140, 230), buttonWidth, 55);
                     categoryButton.putClientProperty("categoryName", categoryName);
-                    categoryButton.addActionListener(e -> searchGames(categoryName));
+                    //Searches by the genre clicked if a category button is clicked
+                    categoryButton.addActionListener(e -> {
+                        searchByTitle = false;
+                        searchByGenre = true;
+                        searchGames(categoryName);
+                    });
                     categoryButtons.add(categoryButton);
                     column.add(categoryButton);
                 } else
@@ -330,11 +335,20 @@ public class DashboardView extends JPanel {
         //Creates a collection to store games in and "searches"
         GameCollection searchCol = new GameCollection();
 
-        searchCol = searchEngine.searchByTitle();
+        if(searchByTitle)
+        {
+            System.out.println("Searching by title for: " + query);
+            searchCol = searchEngine.searchByTitle();
+        }
+        else if (searchByGenre)
+        {
+            System.out.println("Searching by genre for: " + query);
+            searchCol = searchEngine.searchByGenre();
+            searchByTitle = true;
+            searchByGenre = false;
+        }
 
         //debug section
-        System.out.println("Searching for: " + query);
-
         searchCol.printAllGames();
 
         searchCol.getGenres();

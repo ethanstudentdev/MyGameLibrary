@@ -1,3 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <accounts>
+    <account>
+        <username>ethan</username>
+        <password>ethan1</password>
+        <isAdmin>false</isAdmin>
+        <collections>
+            <collection>
+                <title>Favorites</title>
+            </collection>
+        </collections>
+        <ratings>
+            <rating gameId="Star Wars: The Deckbuilding Game" value="5"/>
+        </ratings>
+        <reviews/>
+    </account>
 </accounts>

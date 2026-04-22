@@ -30,6 +30,11 @@ public class CollectionsView extends JPanel {
     private List<BoardGame> displayedGames;
     private final GameParser parser;
 
+    //Booleans for sorting
+    private boolean titleSortReverse;
+    private boolean publisherSortReverse;
+    private boolean ratingSortReverse;
+
     private RoundedCornerButton collections;
     private RoundedCornerButton dashboard;
     private RoundedCornerButton logout;
@@ -51,6 +56,9 @@ public class CollectionsView extends JPanel {
         this.parser = parser;
         this.userCollections = new ArrayList<>();
         this.admin = admin;
+        this.titleSortReverse = false;
+        this.ratingSortReverse = false;
+        this.publisherSortReverse = false;
         initializeCollections();
         initializeUI();
         initializeBehavior();
@@ -218,7 +226,23 @@ public class CollectionsView extends JPanel {
         gamesTable.setRowHeight(80);
         gamesTable.setBackground(Color.WHITE);
         gamesTable.setGridColor(accentColor);
-        gamesTable.getColumnModel().getColumn(0).setPreferredWidth(110);
+        //Mouse listener for sorting behavior
+        gamesTable.getTableHeader().addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                int viewColumn = gamesTable.columnAtPoint(e.getPoint());
+
+                if (viewColumn != -1)
+                {
+                    //Converts the current columns index to whatever it is when pressed
+                    int modelColumn = gamesTable.convertColumnIndexToModel(viewColumn);
+                    //call to sort header
+                    sortHeader(modelColumn,currentCollection);
+                }
+            }
+        });
         gamesTable.getColumnModel().getColumn(0).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -508,5 +532,61 @@ public class CollectionsView extends JPanel {
     private void searchCollections(String query) {
         /** TODO: implement search logic for collections. */
         System.out.println("Searching for: " + query);
+    }
+
+    private void sortHeader(int column, GameCollection collection)
+    {
+        switch (column)
+        {
+            case 0:
+                System.out.println("Cover header clicked");
+                break;
+            case 1:
+                System.out.println("Name header clicked");
+                if(!titleSortReverse)
+                {
+                    collection.getGames().sort(BoardGame.byTitle);
+                    titleSortReverse = true;
+                } else if (titleSortReverse)
+                {
+                    collection.getGames().sort(BoardGame.byTitle.reversed());
+                    titleSortReverse = false;
+                }
+                updateGamesTable();
+                break;
+            case 2:
+                System.out.println("Publisher header clicked");
+                if(!publisherSortReverse)
+                {
+                    collection.getGames().sort(BoardGame.byPublisher);
+                    publisherSortReverse = true;
+                } else if (publisherSortReverse)
+                {
+                    collection.getGames().sort(BoardGame.byPublisher.reversed());
+                    publisherSortReverse = false;
+                }
+                updateGamesTable();
+                break;
+            case 3:
+                //TODO: Doesnt work - fix
+                System.out.println("Average Rating header clicked");
+                if(!ratingSortReverse)
+                {
+                    collection.getGames().sort(BoardGame.byRating);
+                    ratingSortReverse = true;
+                } else if (ratingSortReverse)
+                {
+                    collection.getGames().sort(BoardGame.byRating.reversed());
+                    ratingSortReverse = false;
+                }
+                updateGamesTable();
+                break;
+            case 4:
+                System.out.println("Rate it! header clicked");
+                break;
+            case 5:
+                System.out.println("Leave/View a Review header clicked");
+                break;
+        }
     }
 }

@@ -3,6 +3,8 @@ import java.util.Comparator;
 
 /**
  * A class that represents a single BoardGame object
+ *
+ * @author Ethan Johnson
  */
 public class BoardGame {
     //Fields
@@ -174,4 +176,10 @@ public class BoardGame {
      */
     public static Comparator<BoardGame> byRating =
             Comparator.comparing(BoardGame::getAvgRating);
+
+    /**
+     *  Compares a board game to another by its publisher
+     */
+    public static Comparator<BoardGame> byPublisher =
+            Comparator.comparing(BoardGame::getPublisher);
 }

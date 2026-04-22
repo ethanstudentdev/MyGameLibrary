@@ -335,6 +335,7 @@ public class DashboardView extends JPanel {
         //Creates a collection to store games in and "searches"
         GameCollection searchCol = new GameCollection();
 
+        //This logic means search by title is always the default search way since the else if resets it
         if(searchByTitle)
         {
             System.out.println("Searching by title for: " + query);
@@ -349,6 +350,7 @@ public class DashboardView extends JPanel {
         }
 
         //debug section
+        searchCol.printAllGames();
         searchCol.printAllGames();
 
         searchCol.getGenres();

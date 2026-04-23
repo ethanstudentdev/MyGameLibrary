@@ -65,6 +65,7 @@ public class User {
         if (accountDatabase.validateLogin(username, password)) {
             this.username = username;
             this.password = password;
+            this.isAdmin = accountDatabase.isAdmin(username);
             System.out.println("Login successful for: " + username);
             return true;
         }
@@ -144,6 +145,13 @@ public class User {
     public void changeUserToAdmin()
     {
         isAdmin=true;
+    }
+
+    public boolean isAdmin() {
+        if (!username.isEmpty()) {
+            return accountDatabase.isAdmin(username);
+        }
+        return isAdmin;
     }
 
     public boolean getAdminStatus()

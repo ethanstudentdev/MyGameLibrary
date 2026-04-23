@@ -101,6 +101,23 @@ public class AccountDatabase {
         return false;
     }
 
+    public boolean isAdmin(String username) {
+        for (int i = 0; i < usernames.size(); i++) {
+            if (usernames.get(i).equals(username)) {
+                return adminStatus.get(i);
+            }
+        }
+        return false;
+    }
+
+    public void setAdmin(String username, boolean value) {
+        int i = findUserIndex(username);
+        if (i != -1) {
+            adminStatus.set(i, value);
+            saveToFile();
+        }
+    }
+
     public void createCollection(String username, String collectionName) {
         int userIndex = findUserIndex(username);
         if (userIndex == -1 || collectionName == null || collectionName.isBlank()) {

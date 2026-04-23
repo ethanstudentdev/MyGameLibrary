@@ -24,6 +24,7 @@ public class DashboardView extends JPanel {
     private ArrayList<String> categoryNames;
     private Search searchEngine;
     private Admin admin;
+    private BrowseView browser;
 
     private boolean searchByTitle;
     private boolean searchByGenre;
@@ -38,6 +39,13 @@ public class DashboardView extends JPanel {
     private RoundedCornerButton leftArrow;
     private RoundedCornerButton rightArrow;
 
+    /**
+     * The dashboardView constructor
+     *
+     * @param username The username of the current user
+     * @param app The app being user
+     * @param admin admin to load files from
+     */
     public DashboardView(String username, MyGameLibraryApp app, Admin admin) {
         this.username = username;
         this.app = app;
@@ -310,6 +318,10 @@ public class DashboardView extends JPanel {
         });
     }
 
+    /**
+     * Creates an admin panel that the user can make themselves an admin, change the gamefile path, accountdatabase path
+     *
+     */
     private void performAdmin() {
         JDialog dialog = new JDialog(
                 (java.awt.Frame) SwingUtilities.getWindowAncestor(this),
@@ -327,7 +339,7 @@ public class DashboardView extends JPanel {
 
         JButton button1 = new JButton("Make Current User Admin");
         JButton button2 = new JButton("Change game path");
-        JButton button3 = new JButton("Option 3");
+        JButton button3 = new JButton("Change account database path");
         JButton button4 = new JButton("Close");
 
         button1.addActionListener(d -> {
@@ -405,6 +417,9 @@ public class DashboardView extends JPanel {
 
         searchCol.getGenres();
         searchCol.printGenres();
+
+        //Creates a new Browse view window with search criteria
+        browser = new BrowseView(searchCol);
     }
 
     private void filterByGameType(String type) {

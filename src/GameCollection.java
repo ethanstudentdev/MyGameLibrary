@@ -1,12 +1,17 @@
 import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A class that represents a single collection of BoardGame objects
+ *
+ * @author Ethan Johnson
  */
 public class GameCollection {
     //Fields
 
     private String title;
-    private ArrayList<BoardGame> games;
+    final private ArrayList<BoardGame> games;
+    final private ArrayList<String> genres;
 
     //Constructors
 
@@ -18,6 +23,7 @@ public class GameCollection {
     public GameCollection(String title)
     {
         this.title = title;
+        this.genres = new ArrayList<String>();
         this.games = new ArrayList<BoardGame>();
     }
 
@@ -27,6 +33,7 @@ public class GameCollection {
     public GameCollection()
     {
         this.title = "default";
+        this.genres = new ArrayList<String>();
         this.games = new ArrayList<BoardGame>();
     }
 
@@ -60,11 +67,64 @@ public class GameCollection {
      */
     public String getTitle() {return title;}
 
-    public void printAllNames(){
+    /**
+     * Adds all the genres that exist within the gamecollection to a list and return that list
+     *
+     * @return
+     */
+    public ArrayList<String> getGenres()
+    {
+        for (BoardGame game : games)
+        {
+           ArrayList<String> currentGenres = game.getGenre();
+           for(String genre : currentGenres)
+           {
+               if(!(genres.contains(genre)))
+               {
+                   genres.add(genre);
+               }
+           }
+        }
+        return genres;
+    }
+
+    /**
+     * Debug method to print all games in collection and their info to the console
+     */
+    public void printAllGames()
+    {
+        int i = 0;
         for(BoardGame game : games)
         {
+            i++;
+            System.out.println("Game # : " + i);
+            System.out.println("Title");
             System.out.println(game.getTitle());
+            System.out.println("Image Link");
+            System.out.println(game.getImage());
+            System.out.println("Description");
+            System.out.println(game.getDescription());
+            System.out.println("Genres");
+            for(String genre : game.getGenre())
+            {
+                System.out.println(genre);
+            }
+            System.out.println("Publisher");
+            System.out.println(game.getPublisher());
+            System.out.println("Average Rating");
+            System.out.println(game.getAvgRating());
+            System.out.println();
         }
     }
 
+    public void printGenres()
+    {
+        System.out.println("Genres in collection : " + title);
+        for(String g : genres)
+        {
+            System.out.println(g);
+        }
+    }
+
+    public List<BoardGame> getGames() {return games;}
 }

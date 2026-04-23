@@ -572,10 +572,22 @@ public class CollectionsView extends JPanel {
                 System.out.println("Average Rating header clicked");
                 if(!ratingSortReverse)
                 {
+                    for(BoardGame game : displayedGames)
+                    {
+                        float average = accountDatabase.getAverageRatingForGame(game.getTitle());
+                        game.setAvgRating(average);
+                    }
+
                     collection.getGames().sort(BoardGame.byRating);
                     ratingSortReverse = true;
                 } else if (ratingSortReverse)
                 {
+                    for(BoardGame game : displayedGames)
+                    {
+                        float average = accountDatabase.getAverageRatingForGame(game.getTitle());
+                        game.setAvgRating(average);
+                    }
+
                     collection.getGames().sort(BoardGame.byRating.reversed());
                     ratingSortReverse = false;
                 }

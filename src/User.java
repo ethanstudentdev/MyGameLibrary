@@ -9,6 +9,7 @@ public class User {
     //Fields
     private String username;
     private String password;
+    private boolean isAdmin;
     private final List<GameCollection> personalCollections;
     private final AccountDatabase accountDatabase;
 
@@ -24,6 +25,7 @@ public class User {
         this.password = "";
         this.personalCollections = new ArrayList<>();
         this.accountDatabase = accountDatabase;
+        this.isAdmin = false;
     }
 
     //Methods
@@ -134,5 +136,18 @@ public class User {
     // TODO: Update this method to also save the updated personal collections to a file
     public void removeCollection(GameCollection collection) {
         personalCollections.remove(collection);
+    }
+
+    /**
+     *
+     */
+    public void changeUserToAdmin()
+    {
+        isAdmin=true;
+    }
+
+    public boolean getAdminStatus()
+    {
+        return isAdmin;
     }
 }

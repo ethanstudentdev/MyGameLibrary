@@ -11,6 +11,7 @@ public class BoardGame {
 
     private String title;
     private String description;
+    private float averageRating;
     private final RatingList ratings;
     private final ReviewList reviews;
     private String image;
@@ -36,6 +37,7 @@ public class BoardGame {
         this.reviews = reviews;
         this.image = image;
         this.publisher = publisher;
+        this.averageRating = getAvgRating();
     }
 
     /**
@@ -50,6 +52,7 @@ public class BoardGame {
         this.ratings = new RatingList();
         this.reviews = new ReviewList();
         this.genre = new ArrayList<String>();
+        this.averageRating = 0;
     }
 
     //Methods
@@ -156,6 +159,13 @@ public class BoardGame {
      */
     public void setPublisher(String publisher){this.publisher = publisher;}
 
+    /**
+     * Sets the average rating of a board game object manually
+     *
+     * @param average Average rating
+     */
+    public void setAvgRating(float average){this.averageRating = average;}
+
     //Returns//
     /**
      *  Calculates the average rating for a BoardGame object
@@ -163,6 +173,8 @@ public class BoardGame {
      * @return The average rating for a BoardGame
      */
     public float getAvgRating() {return ratings.getAverage();}
+
+    public float getAverage() {return this.averageRating;}
 
     //Comparators
     /**
@@ -175,7 +187,7 @@ public class BoardGame {
      *  Compares a board game to another by its rating average
      */
     public static Comparator<BoardGame> byRating =
-            Comparator.comparing(BoardGame::getAvgRating);
+            Comparator.comparing(BoardGame::getAverage);
 
     /**
      *  Compares a board game to another by its publisher

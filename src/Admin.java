@@ -11,7 +11,7 @@ import java.io.File;
  * It stores the paths for accounts and games files.
  * Any user with isAdmin = true can change these paths.
  */
-public class Admin {
+public class Admin{
 
     static final String CONFIG_PATH = "assets/config.xml";
 

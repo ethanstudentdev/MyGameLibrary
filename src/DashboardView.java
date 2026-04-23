@@ -23,6 +23,7 @@ public class DashboardView extends JPanel {
     private File allGamesFile;
     private ArrayList<String> categoryNames;
     private Search searchEngine;
+    private Admin admin;
 
     private boolean searchByTitle;
     private boolean searchByGenre;
@@ -30,6 +31,7 @@ public class DashboardView extends JPanel {
     private RoundedCornerButton collections;
     private RoundedCornerButton dashboard;
     private RoundedCornerButton logout;
+    private RoundedCornerButton adminButton;
 
     private List<RoundedCornerButton> categoryButtons;
     private JTextField searchBar;
@@ -79,7 +81,9 @@ public class DashboardView extends JPanel {
         collections = createStyledButton("My Collections", buttonColor, Color.WHITE, buttonHoverColor);
         dashboard = createStyledButton("Dashboard", buttonColor, Color.WHITE, buttonHoverColor);
         logout = createStyledButton("Logout", logoutButtonColor, Color.WHITE, logoutButtonHoverColor);
+        adminButton = createStyledButton("Admin",buttonColor,Color.WHITE,buttonHoverColor);
 
+        navPanel.add(adminButton);
         navPanel.add(collections);
         navPanel.add(dashboard);
         navPanel.add(logout);
@@ -283,6 +287,7 @@ public class DashboardView extends JPanel {
         collections.addActionListener(e -> openCollections());
         dashboard.addActionListener(e -> openDashboard());
         logout.addActionListener(e -> performLogout());
+       adminButton.addActionListener(e -> performAdmin());
 
         if (categoryButtons != null) {
             for (RoundedCornerButton categoryButton : categoryButtons) {
@@ -303,6 +308,51 @@ public class DashboardView extends JPanel {
                 searchGames(query);
             }
         });
+    }
+
+    private void performAdmin() {
+        JDialog dialog = new JDialog(
+                (java.awt.Frame) SwingUtilities.getWindowAncestor(this),
+                "Choose an Option",
+                true
+        );
+
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setSize(300, 250);
+        dialog.setLocationRelativeTo(this);
+
+        JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.setLayout(new GridLayout(4, 1, 0, 10));
+
+        JButton button1 = new JButton("Make Current User Admin");
+        JButton button2 = new JButton("Change game path");
+        JButton button3 = new JButton("Option 3");
+        JButton button4 = new JButton("Close");
+
+        button1.addActionListener(d -> {
+            //JOptionPane.showMessageDialog(dialog, "You clicked Option 1");
+
+        });
+
+        button2.addActionListener(d -> {
+            //JOptionPane.showMessageDialog(dialog, "You clicked Option 2");
+
+        });
+
+        button3.addActionListener(d -> {
+            JOptionPane.showMessageDialog(dialog, "You clicked Option 3");
+        });
+
+        button4.addActionListener(d -> dialog.dispose());
+
+        panel.add(button1);
+        panel.add(button2);
+        panel.add(button3);
+        panel.add(button4);
+
+        dialog.setContentPane(panel);
+        dialog.setVisible(true);
     }
 
     private void openCollections() {

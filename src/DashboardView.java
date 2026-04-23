@@ -24,6 +24,7 @@ public class DashboardView extends JPanel {
     private ArrayList<String> categoryNames;
     private Search searchEngine;
     private Admin admin;
+    private boolean isAdmin;
     private BrowseView browser;
 
     private boolean searchByTitle;
@@ -46,9 +47,11 @@ public class DashboardView extends JPanel {
      * @param app The app being user
      * @param admin admin to load files from
      */
-    public DashboardView(String username, MyGameLibraryApp app, Admin admin) {
+    public DashboardView(String username, MyGameLibraryApp app, Admin admin, boolean isAdmin) {
         this.username = username;
         this.app = app;
+        this.admin = admin;
+        this.isAdmin = isAdmin;
         this.allGamesFile = new File("assets","bgg90Games.xml");
         this.parser = new GameParser();
         this.masterCollection = parser.parse(allGamesFile);

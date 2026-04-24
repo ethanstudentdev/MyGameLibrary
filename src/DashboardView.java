@@ -1,10 +1,9 @@
-import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.swing.*;
 
 /**
  * DashboardView is the view the user reaches after login.
@@ -25,6 +24,7 @@ public class DashboardView extends JPanel {
     private Search searchEngine;
     private Admin admin;
     private boolean isAdmin;
+    private AccountDatabase accountDatabase;
     private BrowseView browser;
 
     private boolean searchByTitle;
@@ -47,11 +47,12 @@ public class DashboardView extends JPanel {
      * @param app The app being user
      * @param admin admin to load files from
      */
-    public DashboardView(String username, MyGameLibraryApp app, Admin admin, boolean isAdmin) {
+    public DashboardView(String username, MyGameLibraryApp app, Admin admin, boolean isAdmin, AccountDatabase accountDatabase) {
         this.username = username;
         this.app = app;
         this.admin = admin;
         this.isAdmin = isAdmin;
+        this.accountDatabase = accountDatabase;
         this.allGamesFile = new File("assets","bgg90Games.xml");
         this.parser = new GameParser();
         this.masterCollection = parser.parse(allGamesFile);
@@ -326,6 +327,8 @@ public class DashboardView extends JPanel {
      *
      */
     private void performAdmin() {
+        boolean currentlyAdmin = accountDatabase.isAdmin(username);
+
         JDialog dialog = new JDialog(
                 (java.awt.Frame) SwingUtilities.getWindowAncestor(this),
                 "Choose an Option",
@@ -346,17 +349,65 @@ public class DashboardView extends JPanel {
         JButton button4 = new JButton("Close");
 
         button1.addActionListener(d -> {
-            //JOptionPane.showMessageDialog(dialog, "You clicked Option 1");
-
+            int confirm = JOptionPane.showConfirmDialog(dialog, "Make " + username + " an admin?", "Confirm", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                isAdmin = true;
+                accountDatabase.setAdmin(username, true);
+                JOptionPane.showMessageDialog(dialog, username + " is now an admin.");
+            }
         });
 
         button2.addActionListener(d -> {
-            //JOptionPane.showMessageDialog(dialog, "You clicked Option 2");
-
+            if (!currentlyAdmin) {
+                JOptionPane.showMessageDialog(dialog, "You must be an admin to change the game path.");
+                return;
+            }
+            String defaultPath = "bgg90Games.xml";
+            JTextField pathField = new JTextField(admin.getGamesFile());
+            Object[] message = {"Game file path:", pathField};
+            int option = JOptionPane.showOptionDialog(dialog, message, "Change Game Path",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null,
+                    new String[]{"Save", "Reset to Default", "Cancel"}, "Save");
+            if (option == 0) {
+                String newPath = pathField.getText().trim();
+                if (!newPath.isEmpty()) {
+                    admin.setGamesFile(newPath);
+                    allGamesFile = new File(newPath);
+                    masterCollection = parser.parse(allGamesFile);
+                    categoryNames = masterCollection.getGenres();
+                    JOptionPane.showMessageDialog(dialog, "Game path updated to:\n" + newPath);
+                }
+            } else if (option == 1) {
+                admin.setGamesFile(defaultPath);
+                allGamesFile = new File(defaultPath);
+                masterCollection = parser.parse(allGamesFile);
+                categoryNames = masterCollection.getGenres();
+                JOptionPane.showMessageDialog(dialog, "Game path reset to default.");
+            }
         });
 
         button3.addActionListener(d -> {
-            JOptionPane.showMessageDialog(dialog, "You clicked Option 3");
+            if (!currentlyAdmin) {
+                JOptionPane.showMessageDialog(dialog, "You must be an admin to change the account database path.");
+                return;
+            }
+
+            String defaultPath = "assets/accounts.xml";
+            JTextField pathField = new JTextField(admin.getAccountsFile());
+            Object[] message = {"Account database path:", pathField};
+            int option = JOptionPane.showOptionDialog(dialog, message, "Change Account Database Path",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null,
+                    new String[]{"Save", "Reset to Default", "Cancel"}, "Save");
+            if (option == 0) {
+                String newPath = pathField.getText().trim();
+                if (!newPath.isEmpty()) {
+                    admin.setAccountsFile(newPath);
+                    JOptionPane.showMessageDialog(dialog, "Account database path updated to:\n" + newPath);
+                }
+            } else if (option == 1) {
+                admin.setAccountsFile(defaultPath);
+                JOptionPane.showMessageDialog(dialog, "Account database path reset to default.");
+            }
         });
 
         button4.addActionListener(d -> dialog.dispose());
@@ -405,7 +456,6 @@ public class DashboardView extends JPanel {
         {
             System.out.println("Searching by title for: " + query);
             searchCol = searchEngine.searchByTitle();
-            app.showBrowseView(username, searchCol);
         }
         else if (searchByGenre)
         {
@@ -413,7 +463,6 @@ public class DashboardView extends JPanel {
             searchCol = searchEngine.searchByGenre();
             searchByTitle = true;
             searchByGenre = false;
-            app.showBrowseView(username, searchCol);
         }
 
         //debug section
@@ -424,7 +473,7 @@ public class DashboardView extends JPanel {
         searchCol.printGenres();
 
         //Creates a new Browse view window with search criteria
-        browser = new BrowseView(searchCol);
+        browser = new BrowseView(username, searchCol, app, admin);
     }
 
     private void filterByGameType(String type) {

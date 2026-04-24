@@ -66,7 +66,7 @@ public class MyGameLibraryApp implements LoginPopup.LoginListener {
      * @param username the username of the logged-in user
      */
     public void showDashboardView(String username) {
-        switchTo(new DashboardView(username, this, admin, accountDatabase.isAdmin(username)));
+        switchTo(new DashboardView(username, this, admin, accountDatabase.isAdmin(username), accountDatabase));
     }
 
     /**

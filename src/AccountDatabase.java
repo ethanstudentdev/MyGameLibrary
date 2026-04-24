@@ -111,10 +111,12 @@ public class AccountDatabase {
     }
 
     public void setAdmin(String username, boolean value) {
-        int i = findUserIndex(username);
-        if (i != -1) {
-            adminStatus.set(i, value);
-            saveToFile();
+        for (int i = 0; i < usernames.size(); i++) {
+            if (usernames.get(i).equals(username)) {
+                adminStatus.set(i, value);
+                saveToFile();
+                return;
+            }
         }
     }
 

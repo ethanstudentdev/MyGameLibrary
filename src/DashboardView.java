@@ -424,7 +424,7 @@ public class DashboardView extends JPanel {
         searchCol.printGenres();
 
         //Creates a new Browse view window with search criteria
-        browser = new BrowseView(searchCol);
+        browser = new BrowseView(username, searchCol, app, admin);
     }
 
     private void filterByGameType(String type) {

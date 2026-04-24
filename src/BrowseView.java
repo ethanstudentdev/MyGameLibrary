@@ -111,7 +111,7 @@ public class BrowseView extends JPanel {
         JPanel bottomRightSubpanel = new JPanel(new BorderLayout());
         bottomRightSubpanel.setPreferredSize(new Dimension(((9 * screenSize.width) / 21), ((13 * screenSize.height) / 21) ));
 
-        JPanel genreSearch = new JPanel(new GridLayout(3,3,10,10));
+        JPanel genreSearch = new JPanel(new GridLayout(0, 3, 10, 10));
         genreSearch.setPreferredSize(new Dimension(((8 * screenSize.width) / 21), ((13 * screenSize.height) / 21) ));
 
         JLabel resultsLabel = new JLabel("Search Results");
@@ -121,6 +121,32 @@ public class BrowseView extends JPanel {
         JLabel genreSearchLabel = new JLabel("Search by Genre");
         genreSearchLabel.setHorizontalAlignment(SwingConstants.CENTER);
         genreSearchLabel.setFont(new Font("Arial", Font.BOLD, 14));
+
+        //Buttons to search by genre
+        categoryButtons = new ArrayList<>();
+
+        Collections.sort(categoryNames);
+
+        //for each genre in the results
+        for (String categoryName : categoryNames) {
+            //make a new button
+            RoundedCornerButton categoryButton = createStyledButton(categoryName, accentColor, Color.WHITE, new Color(0, 140, 230), 0, 50);
+
+            //it can search
+            categoryButton.addActionListener(e -> {
+                File allGamesFile = new File("assets",admin.getGamesFile());
+                GameParser parser = new GameParser();
+                GameCollection allGames = parser.parse(allGamesFile);
+
+                Search search = new Search(categoryName, allGames);
+                GameCollection searchCol = search.searchByGenre();
+
+                app.showBrowseView(username, searchCol);
+            });
+
+            //add it to genre search
+            genreSearch.add(categoryButton);
+        }
 
         //subpanel in top left with search bar
         JPanel searchSubpanel = new JPanel();
@@ -156,88 +182,14 @@ public class BrowseView extends JPanel {
         bottom.add(resultsSubpanel, BorderLayout.WEST);
         bottom.add(bottomRightSubpanel, BorderLayout.EAST);
         bottomRightSubpanel.add(genreSearchLabel, BorderLayout.NORTH);
-        bottomRightSubpanel.add(genreSearch, BorderLayout.CENTER);
+        JScrollPane genreScrollPane = new JScrollPane(genreSearch);
 
-        //setting up genre search buttons
-        //Taken from dasshboardview
-        JPanel gridPanel = new JPanel();
-        gridPanel.setLayout(new BoxLayout(gridPanel, BoxLayout.X_AXIS));
-        gridPanel.setBackground(backgroundColor);
+        //Will only ever scroll vertically
+        genreScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        genreScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        genreScrollPane.setBorder(null); // Optional: removes the default scroll pane border
 
-        Collections.sort(categoryNames);
-        int maxLabelLength = 0;
-
-        for (String genre : categoryNames)
-        {
-            maxLabelLength = Math.max(maxLabelLength, genre.length());
-        }
-        int buttonWidth = Math.max(180, maxLabelLength * 11 + 40);
-        int columnWidth = buttonWidth + 20;
-
-        categoryButtons = new ArrayList<>();
-        for (int i = 0; i < categoryNames.size(); i += 3)
-        {
-            JPanel column = new JPanel(new GridLayout(5, 1, 0, 20));
-            column.setBackground(backgroundColor);
-            for (int row = 0; row < 3; row++) {
-                int index = i + row;
-                if (index < categoryNames.size())
-                {
-                    String categoryName = categoryNames.get(index);
-                    RoundedCornerButton categoryButton = createStyledButton(categoryName, accentColor, Color.WHITE, new Color(0, 140, 230), buttonWidth, 55);
-                    categoryButton.putClientProperty("categoryName", categoryName);
-                    //Searches by the genre clicked if a category button is clicked
-                    categoryButton.addActionListener(e -> {
-                        GameParser parser = new GameParser();
-
-                        File allGamesFile = new File("assets",admin.getGamesFile());
-                        GameCollection allGames = parser.parse(allGamesFile);
-
-                        Search search = new Search(categoryName, allGames);
-                        GameCollection searchCol = search.searchByGenre();
-
-                        app.showBrowseView(username, searchCol);
-                    });
-                    categoryButtons.add(categoryButton);
-                    column.add(categoryButton);
-                } else
-                {
-                    column.add(Box.createVerticalGlue());
-                }
-            }
-            gridPanel.add(column);
-            if (i + 3 < categoryNames.size())
-            {
-                gridPanel.add(Box.createHorizontalStrut(20));
-            }
-        }
-
-        JScrollPane categoryScrollPane = new JScrollPane(gridPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        categoryScrollPane.setBorder(BorderFactory.createEmptyBorder());
-        categoryScrollPane.setPreferredSize(new Dimension(3 * columnWidth - 20, 240));
-        categoryScrollPane.getViewport().setBackground(backgroundColor);
-        categoryScrollPane.setOpaque(false);
-        categoryScrollPane.getViewport().setOpaque(false);
-
-        leftArrow = createStyledButton("<", buttonColor, Color.WHITE, buttonHoverColor, 60, 55);
-        rightArrow = createStyledButton(">", buttonColor, Color.WHITE, buttonHoverColor, 60, 55);
-
-        leftArrow.addActionListener(e -> scrollCategoryPanel(categoryScrollPane, -columnWidth));
-        rightArrow.addActionListener(e -> scrollCategoryPanel(categoryScrollPane, columnWidth));
-
-        updateArrowStates(categoryScrollPane);
-
-        JPanel categoryNavigationPanel = new JPanel(new BorderLayout(25, 0));
-        categoryNavigationPanel.setBackground(backgroundColor);
-        categoryNavigationPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        categoryNavigationPanel.add(leftArrow, BorderLayout.WEST);
-        categoryNavigationPanel.add(categoryScrollPane, BorderLayout.CENTER);
-        categoryNavigationPanel.add(rightArrow, BorderLayout.EAST);
-        categoryNavigationPanel.setPreferredSize(new Dimension(((8 * screenSize.width) / 21), ((13 * screenSize.height) / 21) ));
-
-        genreSearch.add(categoryNavigationPanel);
-
-        //done with genre search
+        bottomRightSubpanel.add(genreScrollPane, BorderLayout.CENTER);
 
         //Initializing the results table
         searchResultTable = new JTable();
@@ -312,30 +264,36 @@ public class BrowseView extends JPanel {
 
         table.setModel(model);
 
-        //for all the games in our search results
-        for(BoardGame game : contents.getGames()){
-            ImageIcon imageIcon = null;
-            try {
-                //get the image url
-                URL url = new URL(game.getImage());
-                //and make imageicon that image
-                imageIcon = new ImageIcon(url);
+        if(!contents.getGames().isEmpty()) {
+            //for all the games in our search results
+            for (BoardGame game : contents.getGames()) {
+                ImageIcon imageIcon = null;
+                try {
+                    //get the image url
+                    URL url = new URL(game.getImage());
+                    //and make imageicon that image
+                    imageIcon = new ImageIcon(url);
 
-                //Resizing image
-                Image img = imageIcon.getImage().getScaledInstance(75, 75, Image.SCALE_SMOOTH);
-                imageIcon = new ImageIcon(img);
+                    //Resizing image
+                    Image img = imageIcon.getImage().getScaledInstance(75, 75, Image.SCALE_SMOOTH);
+                    imageIcon = new ImageIcon(img);
 
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                //Default image would go here
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                    //Default image would go here
+                }
+
+                model.addRow(new Object[]{
+                        imageIcon,
+                        game.getTitle(),
+                        game.getPublisher(),
+                        game.getAvgRating()
+                });
             }
-
-            model.addRow(new Object[]{
-                    imageIcon,
-                    game.getTitle(),
-                    game.getPublisher(),
-                    game.getAvgRating()
-            });
+        }
+        else if (results.getGames().isEmpty()) {
+            // Add a single row with the message
+            model.addRow(new Object[]{"", "Error: ", "No Games found", ""});
         }
 
         table.getTableHeader().addMouseListener(new MouseAdapter()
@@ -428,7 +386,6 @@ public class BrowseView extends JPanel {
                 initializeTable(searchResultTable, collection, model);
                 break;
             case 3:
-                //TODO: Doesnt work - fix
                 System.out.println("Average Rating header clicked");
                 if (!ratingSortReverse) {
                     collection.getGames().sort(BoardGame.byRating);

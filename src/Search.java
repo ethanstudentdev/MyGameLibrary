@@ -13,6 +13,7 @@ import java.util.ArrayList;
  */
 public class Search {
     private String query;
+    private String genre;
     private GameCollection source;
 
     /**
@@ -30,6 +31,7 @@ public class Search {
         this.query = query;
         this.source = source;
     }
+
 
     /**
      * Searches a collection by title

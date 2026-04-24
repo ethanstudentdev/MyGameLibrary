@@ -532,6 +532,9 @@ public class CollectionsView extends JPanel {
     private void searchCollections(String query) {
         /** TODO: implement search logic for collections. */
         System.out.println("Searching for: " + query);
+        Search search = new Search(query, currentCollection);
+        GameCollection searchCol = search.searchByTitle();
+        app.showBrowseView(username, searchCol);
     }
 
     private void sortHeader(int column, GameCollection collection)

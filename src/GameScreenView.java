@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.awt.event.FocusAdapter;
@@ -338,7 +339,15 @@ public class GameScreenView extends JPanel {
         searchBar.addActionListener(e -> {
             String query = searchBar.getText();
             if (!query.equals(placeholderText) && !query.trim().isEmpty()) {
-                app.showDashboardView(username);
+                //app.showDashboardView(username);
+                Admin admin = new Admin();
+                GameParser parser = new GameParser();
+
+                File allGamesFile = new File("assets",admin.getGamesFile());
+                GameCollection allGames = parser.parse(allGamesFile);
+
+                Search search = new Search(query, allGames);
+                app.showBrowseView(username, search.searchByTitle());
             }
         });
     }

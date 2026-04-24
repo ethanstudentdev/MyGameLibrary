@@ -89,6 +89,22 @@ public class MyGameLibraryApp implements LoginPopup.LoginListener {
     }
 
     /**
+     * Shows the browse view.
+     *
+     * @param username the username of the logged-in user
+     * @param source the search results to display
+     */
+    public void showBrowseView(String username, GameCollection source){
+        JFrame newFrame = createFrame();
+        newFrame.add((new BrowseView(username, source, this, admin)).frame);
+        newFrame.setVisible(true);
+        if (currentFrame != null) {
+            currentFrame.dispose();
+        }
+        currentFrame = newFrame;
+    }
+
+    /**
      * Called when a user successfully logs in.
      * Shows the dashboard view and hides the login window.
      *

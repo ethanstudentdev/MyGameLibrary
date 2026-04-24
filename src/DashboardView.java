@@ -405,6 +405,7 @@ public class DashboardView extends JPanel {
         {
             System.out.println("Searching by title for: " + query);
             searchCol = searchEngine.searchByTitle();
+            app.showBrowseView(username, searchCol);
         }
         else if (searchByGenre)
         {
@@ -412,6 +413,7 @@ public class DashboardView extends JPanel {
             searchCol = searchEngine.searchByGenre();
             searchByTitle = true;
             searchByGenre = false;
+            app.showBrowseView(username, searchCol);
         }
 
         //debug section

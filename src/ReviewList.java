@@ -5,17 +5,31 @@ import java.util.ArrayList;
  *
  * @author Ethan Johnson
  */
-public class ReviewList {
+public class ReviewList
+{
     //Fields
     final ArrayList<String> reviews;
 
     //Constructors
-    public ReviewList() {
-        this.reviews = new ArrayList<String>();
-    }
+
+    /**
+     * Constructs a ReviewList object
+     */
+    public ReviewList() {this.reviews = new ArrayList<String>();}
 
     //Methods
+
+    /**
+     * Gets the number of strings in ReviewList
+     *
+     * @return The number of strings in the review list - int
+     */
     public int getSize(){return reviews.size();}
 
+    /**
+     * Adds a review to the review list
+     *
+     * @param review The review to add to the list - String
+     */
     public void addReview(String review) {reviews.add(review);}
 }

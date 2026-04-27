@@ -9,14 +9,14 @@ import java.util.Comparator;
 public class BoardGame {
     //Fields
 
-    private String title;
-    private String description;
-    private float averageRating;
-    private final RatingList ratings;
-    private final ReviewList reviews;
-    private String image;
-    private String publisher;
-    private final ArrayList<String> genre;
+    private String title;                   //Title of the board game
+    private String description;             //Description of the board game
+    private float averageRating;            //Average Rating of the board game
+    private final RatingList ratings;       //All ratings of the board game
+    private final ReviewList reviews;       //All reviews of the board game
+    private String image;                   //Image link of the board game
+    private String publisher;               //Publisher of the board game
+    private final ArrayList<String> genre;  //All genres of the board game
 
     //Constructors
 
@@ -27,6 +27,8 @@ public class BoardGame {
      * @param description  The summary description of the Board Game
      * @param ratings      All the ratings of the board game
      * @param reviews      All the reviews of the board game
+     * @param image        The image link for the board game
+     * @param publisher    The publisher of the board game
      */
     public BoardGame(String title, String description, RatingList ratings, ReviewList reviews, String image, String publisher)
     {
@@ -107,7 +109,7 @@ public class BoardGame {
      */
     public RatingList getRatings(){return ratings;}
 
-    //Adders
+    //Adders (Setters for array lists)
 
     /**
      * Adds a genre to the genres
@@ -174,6 +176,11 @@ public class BoardGame {
      */
     public float getAvgRating() {return ratings.getAverage();}
 
+    /**
+     * Gets the average rating that is already existing for the current BoardGame object
+     *
+     * @return
+     */
     public float getAverage() {return this.averageRating;}
 
     //Comparators

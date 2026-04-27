@@ -5,18 +5,35 @@ import java.util.ArrayList;
  *
  * @author Ethan Johnson
  */
-public class RatingList {
+public class RatingList
+{
     //Fields
     final ArrayList<Integer> ratings;
 
     //Constructors
-    public RatingList() {
+
+    /**
+     *  Constructs an arrayList of ratings
+     */
+    public RatingList()
+    {
         this.ratings = new ArrayList<Integer>();
     }
 
     //Methods
+
+    /**
+     * Gets the size of the ratings list
+     *
+     * @return The size int of rating list
+     */
     public int getSize(){return ratings.size();}
 
+    /**
+     * Gets the average of all ratings in the rating list
+     *
+     * @return The average float of rating list or 0 if no ratings exist
+     */
     public float getAverage()
     {
         float sum = 0;
@@ -31,5 +48,10 @@ public class RatingList {
             return (sum / getSize());
     }
 
+    /**
+     * Adds a rating to the rating list
+     *
+     * @param rating The rating to add to rating list
+     */
     public void addRating(int rating) {ratings.add(rating);}
 }

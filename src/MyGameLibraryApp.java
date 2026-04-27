@@ -9,6 +9,7 @@ import javax.swing.*;
  * - Proper window lifecycle management
  *
  * @author Nathaniel Chan
+ * @author Ethan Johnson
  */
 public class MyGameLibraryApp implements LoginPopup.LoginListener {
 

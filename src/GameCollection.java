@@ -70,7 +70,7 @@ public class GameCollection {
     /**
      * Adds all the genres that exist within the gamecollection to a list and return that list
      *
-     * @return
+     * @return A list of genres that are in the game collection - Removing duplicates
      */
     public ArrayList<String> getGenres()
     {
@@ -117,6 +117,9 @@ public class GameCollection {
         }
     }
 
+    /**
+     * Debug method that prints all genres in a collection to console
+     */
     public void printGenres()
     {
         System.out.println("Genres in collection : " + title);
@@ -126,5 +129,10 @@ public class GameCollection {
         }
     }
 
+    /**
+     * Gets the list of Games in a collection
+     *
+     * @return The list of games in a collection
+     */
     public List<BoardGame> getGames() {return games;}
 }

@@ -21,6 +21,10 @@ import java.util.Map;
  * AccountDatabase manages and holds all accounts,
  * and returns account data for validation.
  * Persists account data to an XML file.
+ *
+ * @author Jereme Espinoza
+ * @author Levi Snellgrove
+ * @author Nathaniel Chan
  */
 public class AccountDatabase {
 

@@ -3,6 +3,8 @@ import java.util.List;
 
 /**
  * A class that represents a single User account
+ *
+ * @author Jereme Espinoza
  */
 public class User {
 
@@ -140,22 +142,14 @@ public class User {
     }
 
     /**
+     * Checks to see if the current user is an admin or not
      *
+     * @return True if admin. False if not admin.
      */
-    public void changeUserToAdmin()
-    {
-        isAdmin=true;
-    }
-
     public boolean isAdmin() {
         if (!username.isEmpty()) {
             return accountDatabase.isAdmin(username);
         }
-        return isAdmin;
-    }
-
-    public boolean getAdminStatus()
-    {
         return isAdmin;
     }
 }

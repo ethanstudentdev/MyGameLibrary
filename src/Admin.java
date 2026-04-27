@@ -10,6 +10,8 @@ import java.io.File;
  * Admin manages the application config file (config.xml).
  * It stores the paths for accounts and games files.
  * Any user with isAdmin = true can change these paths.
+ *
+ * @author Jereme Espinoza
  */
 public class Admin{
 
